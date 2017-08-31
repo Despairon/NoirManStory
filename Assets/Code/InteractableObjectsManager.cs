@@ -10,7 +10,6 @@ public enum InteractableObjectType
     // add types here!
 }
 
-
 public static class InteractableObjectsManager
 {
 #region private_members
