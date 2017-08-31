@@ -6,6 +6,7 @@ public enum InteractableObjectType
 {
     INVALID,
     FLOOR,
+    WALL
     // add types here!
 }
 
@@ -28,7 +29,8 @@ public static class InteractableObjectsManager
 
     private static List<InteractableObjectTagMap> interactableObjectsMap = new List<InteractableObjectTagMap>()
     {
-        new InteractableObjectTagMap(InteractableObjectType.FLOOR, "Floor")
+        new InteractableObjectTagMap(InteractableObjectType.FLOOR, "Floor"),
+        new InteractableObjectTagMap(InteractableObjectType.WALL,  "Wall")
 
         //add interactable objects mapping to tags here
     };

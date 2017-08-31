@@ -49,7 +49,7 @@ public class MainCamera : MonoBehaviour
                 var ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out hit, float.PositiveInfinity, LayerMask.GetMask("InteractableObject")))
-                    player.onInteractableObjectClick(hit.collider.gameObject);             
+                    player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
             }
 
             if (player.isMoving)

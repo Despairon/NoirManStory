@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
 
     private bool _isMoving = false;
 
-    private delegate void PlayerInteraction(Player player, GameObject obj);
+    private delegate void PlayerInteraction(Player player, GameObject obj, Vector3 interactionPoint);
 
     private sealed class InteractionTableItem
     {
@@ -23,8 +23,9 @@ public class Player : MonoBehaviour
         public readonly PlayerInteraction      interact;
     }
 
-    private List<InteractionTableItem> playerInteractionTable = new List<InteractionTableItem>()
+    private static List<InteractionTableItem> playerInteractionTable = new List<InteractionTableItem>()
     {
+        new InteractionTableItem(InteractableObjectType.WALL,  new PlayerInteraction(lookAt)),
         new InteractionTableItem(InteractableObjectType.FLOOR, new PlayerInteraction(lookAt)),
         new InteractionTableItem(InteractableObjectType.FLOOR, new PlayerInteraction(moveTo))
         // add player interactions here!
@@ -34,43 +35,38 @@ public class Player : MonoBehaviour
 
 #region public members
 
-    public static void moveTo(Player player, GameObject obj)
+    public static void moveTo(Player player, GameObject obj, Vector3 interactionPoint)
     {
         // TODO: implement
+        lookAt(player, obj, interactionPoint);
     }
 
-    public static void lookAt(Player player, GameObject obj)
+    public static void lookAt(Player player, GameObject obj, Vector3 interactionPoint)
     {
         // TODO: implement
+        var playerToObject = interactionPoint - player.transform.position;
+        playerToObject.y = 0f;
 
-        /*Vector3 targetDir = obj.transform.position - player.transform.position;
-        Vector3 newDir = Vector3.RotateTowards(player.transform.forward, obj.transform.position, Mathf.PI, 0.0F);
-        Debug.DrawRay(player.transform.position, targetDir, Color.red);
-        player.transform.rotation = Quaternion.LookRotation(newDir);*/
+        Quaternion newRotation = Quaternion.LookRotation(playerToObject);
+        player.GetComponent<Rigidbody>().rotation = newRotation;
     }
 
     public bool isMoving
     {
-        get { return _isMoving; }
+        get         { return _isMoving;  }
         private set { _isMoving = value; }
     }
 
-
-    public void interact(GameObject obj)
+    public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
         if (InteractableObjectsManager.isObjectInteractable(obj))
         {
-            var interactionType      = InteractableObjectsManager.getInteractionType(obj);
-            var interactionTableItem = playerInteractionTable.Find(interaction => interaction.interactionType == interactionType);
+            var interactionType = InteractableObjectsManager.getInteractionType(obj);
 
-            if (interactionTableItem != null)
-                interactionTableItem.interact(this, obj);
+            foreach (var interactionTableItem in playerInteractionTable.FindAll(interaction => interaction.interactionType == interactionType))
+                if (interactionTableItem.interact != null)
+                    interactionTableItem.interact(this, obj, interactionPoint);
         }
-    }
-
-    public void onInteractableObjectClick(GameObject obj)
-    {
-        interact(obj);
     }
 
 #endregion
@@ -87,6 +83,11 @@ public class Player : MonoBehaviour
 
     }
 
-#endregion
+    private void FixedUpdate()
+    {
+
+    }
+
+    #endregion
 
 }
