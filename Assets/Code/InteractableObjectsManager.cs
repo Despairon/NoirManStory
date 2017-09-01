@@ -7,7 +7,7 @@ public enum InteractableObjectType
     INVALID,
     FLOOR,
     WALL
-    // add types here!
+    // add types here
 }
 
 public static class InteractableObjectsManager
@@ -31,7 +31,7 @@ public static class InteractableObjectsManager
         new InteractableObjectTagMap(InteractableObjectType.FLOOR, "Floor"),
         new InteractableObjectTagMap(InteractableObjectType.WALL,  "Wall")
 
-        //add interactable objects mapping to tags here
+        // add mappings of interactable object types on tags here
     };
 
 #endregion

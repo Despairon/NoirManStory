@@ -10,6 +10,10 @@ public class Player : MonoBehaviour
     private bool _isMoving;
     private bool _isRotating;
 
+    private bool _doubleClicked;
+
+    private GameObject clickVolumeObjPrev, clickVolumeObjNext;
+
     private PlayerInteractionsManager interactionsManager;
 
     private void setDefaultValues()
@@ -17,7 +21,47 @@ public class Player : MonoBehaviour
         isMoving   = false;
         isRotating = false;
 
+        _doubleClicked = false;
+
+        clickVolumeObjPrev = clickVolumeObjNext = null;
+
         interactionsManager = new PlayerInteractionsManager(this);
+    }
+
+    private bool checkForDoubleClick(Vector3 point)
+    {
+        bool result = false;
+
+        clickVolumeObjNext = createClickVolumeAt(point);
+        if (clickVolumeObjPrev != null)
+        {
+            if (clickVolumeObjNext.GetComponent<BoxCollider>().bounds.Intersects(clickVolumeObjPrev.GetComponent<BoxCollider>().bounds))
+                result = true;
+            else
+                result = false;
+
+            // removes game object from displaying, not class object
+            Destroy(clickVolumeObjPrev);
+        }
+        else
+            result = false;
+
+        clickVolumeObjPrev = clickVolumeObjNext;
+
+        return result;
+    }
+
+    private GameObject createClickVolumeAt(Vector3 point)
+    {
+        var clickVolumeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        clickVolumeObj.transform.position = point;
+        clickVolumeObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        clickVolumeObj.AddComponent<BoxCollider>();
+        clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
+        clickVolumeObj.GetComponent<Renderer>().enabled = false; // TODO: change to 'true' for debug cubes to begin being visible
+
+
+        return clickVolumeObj;
     }
 
     private void attachInteractions()
@@ -46,8 +90,13 @@ public class Player : MonoBehaviour
 
     public void moveTo(GameObject obj, Vector3 interactionPoint)
     {
-        // TODO: implement
-        lookAt(obj, interactionPoint);
+        if (_doubleClicked)
+        {
+            // TODO: implement
+            lookAt(obj, interactionPoint);
+
+            _doubleClicked = false;
+        }
     }
 
     public void lookAt(GameObject obj, Vector3 interactionPoint)
@@ -62,6 +111,8 @@ public class Player : MonoBehaviour
 
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
+        _doubleClicked = checkForDoubleClick(interactionPoint);
+
         interactionsManager.interactWith(obj, interactionPoint);
     }
 
