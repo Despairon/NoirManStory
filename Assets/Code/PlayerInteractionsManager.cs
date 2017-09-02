@@ -2,6 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct PlayerInteractionParams
+{
+    public readonly GameObject obj;
+    public readonly Vector3    interactionPoint;
+
+    public PlayerInteractionParams(GameObject obj, Vector3 interactionPoint)
+    {
+        this.obj              = obj;
+        this.interactionPoint = interactionPoint;
+    }
+}
+
 public class PlayerInteractionsManager
 {
 #region private_members
@@ -26,7 +38,7 @@ public class PlayerInteractionsManager
 
     public readonly Player player;
 
-    public delegate void PlayerInteraction(GameObject obj, Vector3 interactionPoint);
+    public delegate void PlayerInteraction();
 
     public PlayerInteractionsManager(Player player)
     {
@@ -41,15 +53,15 @@ public class PlayerInteractionsManager
     }
 
     
-     public void interactWith(GameObject obj, Vector3 interactionPoint)
+     public void interactWith(PlayerInteractionParams interactionParams)
      {
-        if (InteractableObjectsManager.isObjectInteractable(obj))
+        if (InteractableObjectsManager.isObjectInteractable(interactionParams.obj))
         {
-            var interactionType = InteractableObjectsManager.getInteractionType(obj);
+            var interactionType = InteractableObjectsManager.getInteractionType(interactionParams.obj);
 
             foreach (var interactionTableItem in playerInteractionTable.FindAll(interaction => interaction.interactionType == interactionType))
                 if (interactionTableItem.interact != null)
-                    interactionTableItem.interact(obj, interactionPoint);
+                    interactionTableItem.interact();
         }
     }
      

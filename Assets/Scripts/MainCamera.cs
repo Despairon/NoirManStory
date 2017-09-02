@@ -52,7 +52,7 @@ public class MainCamera : MonoBehaviour
                     player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
             }
 
-            if (player.isMoving)
+            if (player.getState() == PlayerState.MOVING)
                 followPlayer();
 
             //TODO: ...

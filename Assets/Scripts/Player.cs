@@ -2,30 +2,55 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerState
+{
+    DEAD,
+    IDLE,
+    TURNING,
+    MOVING,
+    USING
+}
+
 public class Player : MonoBehaviour
 {
 
 #region private_members
 
-    private bool _isMoving;
-    private bool _isRotating;
+    private delegate void PlayerStateAction(PlayerInteractionParams interactionParams);
 
-    private bool _doubleClicked;
+    private sealed class PlayerStateActionMap
+    {
+        public readonly PlayerState       state;
+        public readonly PlayerStateAction action;
 
-    private GameObject clickVolumeObjPrev, clickVolumeObjNext;
-
-    private PlayerInteractionsManager interactionsManager;
+        public PlayerStateActionMap(PlayerState state, PlayerStateAction action)
+        {
+            this.state  = state;
+            this.action = action;
+        }
+    }
+   
+    private PlayerState                playerState;
+    private bool                       doubleClicked;
+    private GameObject                 clickVolumeObjPrev;
+    private GameObject                 clickVolumeObjNext;
+    private PlayerInteractionsManager  interactionsManager;
+    private PlayerInteractionParams    interactionParameters;
+    private List<PlayerStateActionMap> playerStateActionMap;
 
     private void setDefaultValues()
     {
-        isMoving   = false;
-        isRotating = false;
+        playerState           = PlayerState.IDLE;
 
-        _doubleClicked = false;
+        doubleClicked         = false;
 
-        clickVolumeObjPrev = clickVolumeObjNext = null;
+        clickVolumeObjPrev    = clickVolumeObjNext = null;
 
-        interactionsManager = new PlayerInteractionsManager(this);
+        interactionsManager   = new PlayerInteractionsManager(this);
+
+        interactionParameters = new PlayerInteractionParams(null, Vector3.zero);
+
+        playerStateActionMap  = new List<PlayerStateActionMap>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -60,60 +85,104 @@ public class Player : MonoBehaviour
         clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
         clickVolumeObj.GetComponent<Renderer>().enabled = false; // TODO: change to 'true' for debug cubes to begin being visible
 
-
         return clickVolumeObj;
     }
 
     private void attachInteractions()
     {
-        interactionsManager.addInteraction(InteractableObjectType.WALL,  new PlayerInteractionsManager.PlayerInteraction(lookAt));
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(lookAt));
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(moveTo));
+        interactionsManager.addInteraction(InteractableObjectType.WALL,  new PlayerInteractionsManager.PlayerInteraction(startTurning));
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(startTurning));
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(startMoving));
         // add interactions here...
+    }
+
+    private void attachStateActions()
+    {
+        playerStateActionMap.Add(new PlayerStateActionMap(PlayerState.TURNING, lookAt));
+        playerStateActionMap.Add(new PlayerStateActionMap(PlayerState.MOVING,  lookAt));
+        playerStateActionMap.Add(new PlayerStateActionMap(PlayerState.MOVING,  moveTo));
+        playerStateActionMap.Add(new PlayerStateActionMap(PlayerState.USING,   lookAt));
+        playerStateActionMap.Add(new PlayerStateActionMap(PlayerState.USING,   useIt));
+        // add actions here...
     }
 
 #endregion
 
 #region public members
 
-    public bool isMoving
+    public void startTurning()
     {
-        get         { return _isMoving;  }
-        private set { _isMoving = value; }
+        playerState = PlayerState.TURNING;
     }
 
-    public bool isRotating
+    public void startMoving()
     {
-        get         { return _isRotating;  }
-        private set { _isRotating = value; }
-    }
-
-    public void moveTo(GameObject obj, Vector3 interactionPoint)
-    {
-        if (_doubleClicked)
+        if (doubleClicked)
         {
-            // TODO: implement
-            lookAt(obj, interactionPoint);
+            playerState = PlayerState.MOVING;
 
-            _doubleClicked = false;
+            doubleClicked = false;
         }
     }
 
-    public void lookAt(GameObject obj, Vector3 interactionPoint)
+    public void startUsing()
     {
-        // TODO: implement
-        var playerToObject = interactionPoint - transform.position;
+        if (doubleClicked)
+        {
+            doubleClicked = false;
+
+            playerState = PlayerState.USING;
+        }
+    }
+
+    public void lookAt(PlayerInteractionParams interactionParams)
+    {
+        var playerToObject = interactionParams.interactionPoint - transform.position;
+        playerToObject.y = 0f;
+        // TODO: fix
+        float turningRate = 720f; // degrees
+
+        GetComponent<Rigidbody>().rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(playerToObject), turningRate * Time.deltaTime);
+    }
+
+    public void moveTo(PlayerInteractionParams interactionParams)
+    {
+        var playerToObject = interactionParams.interactionPoint - transform.position;
         playerToObject.y = 0f;
 
-        Quaternion newRotation = Quaternion.LookRotation(playerToObject);
-        GetComponent<Rigidbody>().rotation = newRotation;
+        // TODO: fix
+        float speed = 10;
+
+        GetComponent<Rigidbody>().position = Vector3.MoveTowards(transform.position, playerToObject, speed * Time.deltaTime);
+    }
+
+    public void useIt(PlayerInteractionParams interactionParams)
+    {
+        // TODO: implement
+    }
+
+    public void kill()
+    {
+        playerState = PlayerState.DEAD;
+
+        // TODO: ...
     }
 
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
-        _doubleClicked = checkForDoubleClick(interactionPoint);
+        if (playerState != PlayerState.DEAD)
+        {
+            doubleClicked = checkForDoubleClick(interactionPoint);
 
-        interactionsManager.interactWith(obj, interactionPoint);
+            interactionParameters = new PlayerInteractionParams(obj, interactionPoint);
+
+            interactionsManager.interactWith(interactionParameters);
+        }
+    }
+
+    public PlayerState getState()
+    {
+        return playerState;
     }
 
 #endregion
@@ -124,16 +193,25 @@ public class Player : MonoBehaviour
     {
         setDefaultValues();
         attachInteractions();
+        attachStateActions();
 	}
 	
 	void Update ()
     {
-
+        if (playerState != PlayerState.DEAD)
+        {
+            // TODO: ...
+        }
     }
 
     private void FixedUpdate()
     {
-
+        if (playerState != PlayerState.DEAD)
+        {
+            foreach (var stateAction in playerStateActionMap.FindAll(item => item.state == playerState))
+                if ((stateAction != null) && (stateAction.action != null))
+                    stateAction.action(interactionParameters);
+        }
     }
 
     #endregion
