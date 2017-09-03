@@ -137,23 +137,34 @@ public class Player : MonoBehaviour
 
     public void lookAt(PlayerInteractionParams interactionParams)
     {
-        var playerToObject = interactionParams.interactionPoint - transform.position;
-        playerToObject.y = 0f;
-        // TODO: fix
-        float turningRate = 720f; // degrees
+        var rotationPoint = interactionParams.interactionPoint - transform.position;
+		rotationPoint.y = 0f;
 
-        GetComponent<Rigidbody>().rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(playerToObject), turningRate * Time.deltaTime);
+		float turningRate = 480f; // degrees
+
+		var rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(rotationPoint), turningRate * Time.deltaTime);
+
+		GetComponent<Rigidbody>().MoveRotation(rotation);
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
-    {
-        var playerToObject = interactionParams.interactionPoint - transform.position;
-        playerToObject.y = 0f;
+    {		
+		var distance = Vector3.Distance (interactionParams.interactionPoint, transform.position);
 
-        // TODO: fix
-        float speed = 10;
+		if (distance <= transform.position.y + 0.5f) 
+		{
+			playerState = PlayerState.IDLE;
+			// TODO: notify that player arrived
+			return;
+		}
 
-        GetComponent<Rigidbody>().position = Vector3.MoveTowards(transform.position, playerToObject, speed * Time.deltaTime);
+        var movementPoint = interactionParams.interactionPoint - transform.position;
+		movementPoint.y = 0f;
+
+		float speed = 10f;
+
+		movementPoint = movementPoint.normalized * speed * Time.deltaTime;
+		GetComponent<Rigidbody>().MovePosition(transform.position + movementPoint);
     }
 
     public void useIt(PlayerInteractionParams interactionParams)
