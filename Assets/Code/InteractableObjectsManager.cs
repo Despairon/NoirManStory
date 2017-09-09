@@ -18,7 +18,7 @@ public static class InteractableObjectsManager
     {
         public InteractableObjectTagMap(InteractableObjectType type, string tagName)
         {
-            this.type = type;
+            this.type    = type;
             this.tagName = tagName;
         }
 

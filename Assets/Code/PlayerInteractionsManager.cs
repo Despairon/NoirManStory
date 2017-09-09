@@ -23,11 +23,11 @@ public class PlayerInteractionsManager
         public InteractionTableItem(InteractableObjectType interactionType, PlayerInteraction interact)
         {
             this.interactionType = interactionType;
-            this.interact = interact;
+            this.interact        = interact;
         }
 
         public readonly InteractableObjectType interactionType;
-        public readonly PlayerInteraction interact;
+        public readonly PlayerInteraction      interact;
     }
 
     private List<InteractionTableItem> playerInteractionTable;
@@ -38,7 +38,7 @@ public class PlayerInteractionsManager
 
     public readonly Player player;
 
-    public delegate void PlayerInteraction();
+    public delegate void PlayerInteraction(PlayerInteractionParams interactionParams);
 
     public PlayerInteractionsManager(Player player)
     {
@@ -61,7 +61,7 @@ public class PlayerInteractionsManager
 
             foreach (var interactionTableItem in playerInteractionTable.FindAll(interaction => interaction.interactionType == interactionType))
                 if (interactionTableItem.interact != null)
-                    interactionTableItem.interact();
+                    interactionTableItem.interact(interactionParams);
         }
     }
      

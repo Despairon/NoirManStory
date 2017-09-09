@@ -7,20 +7,20 @@ public class MainCamera : MonoBehaviour
 
 #region private_members
 
-    private Player player;
+    private Player  player;
     private Vector3 initialPosition;
+
+    private void followPlayer()
+    {
+        transform.position = new Vector3(initialPosition.x + player.transform.position.x,
+                                         initialPosition.y,
+                                         initialPosition.z + player.transform.position.z);
+    }
 
 #endregion
 
 
 #region public_members
-
-    public void followPlayer()
-    {
-        transform.position = new Vector3(initialPosition.x + player.transform.position.x,
-                                 initialPosition.y,
-                                 initialPosition.z + player.transform.position.z);
-    }
 
 #endregion
 
@@ -52,7 +52,7 @@ public class MainCamera : MonoBehaviour
                     player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
             }
 
-            if (player.getState() == PlayerState.MOVING)
+            if (player.getState() != PlayerState.DEAD)
                 followPlayer();
 
             //TODO: ...
