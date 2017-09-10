@@ -158,6 +158,7 @@ public class Player : MonoBehaviour
     {
         if (InteractableObjectsManager.isObjectInteractable(collider.gameObject))
         {
+			// TODO:  
             Debug.Log("we hit " + collider.gameObject.name);
             playerState = PlayerState.IDLE;
         }
