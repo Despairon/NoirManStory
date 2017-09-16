@@ -3,30 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum PlayerState
-{
-    DEAD,
-    IDLE,
-    TURNING,
-    MOVING,
-    USING
-}
-
 public class Player : MonoBehaviour
 {
 
 #region private_members   
-    private PlayerState                playerState;
+
+    private bool                       playerAlive;
     private bool                       doubleClicked;
     private GameObject                 clickVolumeObjPrev;
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
     private Animator                   animationStateMachine;
+    private StateMachine               logicStateMachine;
 
     private void setDefaultValues()
     {
-        playerState           = PlayerState.IDLE;
+        playerAlive           = true;
 
         doubleClicked         = false;
 
@@ -36,7 +29,11 @@ public class Player : MonoBehaviour
 
         navigator             = GetComponent<NavMeshAgent>();
 
-        animationStateMachine          = GetComponent<Animator>();
+        animationStateMachine = GetComponent<Animator>();
+
+        gameObject.AddComponent<StateMachine>();
+
+        logicStateMachine     = GetComponent<StateMachine>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -66,7 +63,7 @@ public class Player : MonoBehaviour
     {
         var clickVolumeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
         clickVolumeObj.transform.position = point;
-        clickVolumeObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        clickVolumeObj.transform.localScale = new Vector3(50f, 50f, 50f);
         clickVolumeObj.AddComponent<BoxCollider>();
         clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
         clickVolumeObj.GetComponent<Renderer>().enabled = false; // TODO: change to 'true' for debug cubes to begin being visible
@@ -82,25 +79,50 @@ public class Player : MonoBehaviour
         // add interactions here...
     }
 
+    private void fillStateMachineTransitions()
+    {
+        // TODO: fill logic -> replace null's with methods!!!
+
+        // ordinary transitions table
+        logicStateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_TURNING, null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_MOVING,  null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_USING,   null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.IDLE,           null);
+
+        // transitions to IDLE
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.IDLE, null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.IDLE, null);
+
+        // transitions to DYING
+        logicStateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_DYING, null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_DYING, null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_DYING, null);
+        logicStateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.PLAYER_DYING, null);
+    }
+
 #endregion
 
 #region public members
 
+    public bool isAlive()
+    {
+        return playerAlive;
+    }
+
     public void lookAt(PlayerInteractionParams interactionParams)
     {   
-        playerState = PlayerState.TURNING;
-        navigator.SetDestination(transform.position);
+
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
         if (doubleClicked)
         {
-            playerState = PlayerState.MOVING;
-
-            doubleClicked = false;
-
-            navigator.SetDestination(interactionParams.interactionPoint);
+            // TODO: use these 
+            //navigator.SetDestination(interactionParams.interactionPoint);
+            //const float dist_threshold = 10f;
+            //if (navigator.remainingDistance <= dist_threshold)
+            //    animationStateMachine.SetTrigger("movingEnded");
         }
     }
 
@@ -108,32 +130,25 @@ public class Player : MonoBehaviour
     {
         if (doubleClicked)
         {
-            playerState = PlayerState.USING;
 
-            doubleClicked = false;
         }
     }
 
     public void kill()
     {
-        playerState = PlayerState.DEAD;
-
         // TODO: ...
     }
 
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
-        if (playerState != PlayerState.DEAD)
+        if (playerAlive)
         {
             doubleClicked = checkForDoubleClick(interactionPoint);
 
             interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
-        }
-    }
 
-    public PlayerState getState()
-    {
-        return playerState;
+            doubleClicked = false;
+        }
     }
 
 #endregion
@@ -144,30 +159,14 @@ public class Player : MonoBehaviour
     {
         setDefaultValues();
         attachInteractions();
-    }
-	
-	void Update ()
-    {
-        if (playerState != PlayerState.DEAD)
-        {
-            // TODO: ...
-        }
+        fillStateMachineTransitions();
     }
     
     private void OnTriggerEnter(Collider collider)
     {
         if (InteractableObjectsManager.isObjectInteractable(collider.gameObject))
         {
-			// TODO:  
-            Debug.Log("we hit " + collider.gameObject.name);
-            playerState = PlayerState.IDLE;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (playerState != PlayerState.DEAD)
-        {
+            // TODO: action on reaching destination
 
         }
     }
