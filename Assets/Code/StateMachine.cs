@@ -79,14 +79,6 @@ public class StateMachine : MonoBehaviour
         private set { _isActive = value; }
     }
 
-    public StateMachine()
-    {
-        state    = FSM_TransitionState.IDLE;
-        isActive = false;
-
-        transitionsTable = new List<TransitionNode>();
-    }
-
     public void startExecution()
     {
         state    = FSM_TransitionState.IDLE;
