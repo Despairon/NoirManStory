@@ -8,19 +8,15 @@ public class Player : MonoBehaviour
 
 #region private_members   
 
-    private bool                       playerAlive;
     private bool                       doubleClicked;
     private GameObject                 clickVolumeObjPrev;
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
-    private Animator                   animationStateMachine;
-    private StateMachine               logicStateMachine;
+    private StateMachine               stateMachine;
 
     private void setDefaultValues()
     {
-        playerAlive           = true;
-
         doubleClicked         = false;
 
         clickVolumeObjPrev    = clickVolumeObjNext = null;
@@ -29,11 +25,9 @@ public class Player : MonoBehaviour
 
         navigator             = GetComponent<NavMeshAgent>();
 
-        animationStateMachine = GetComponent<Animator>();
-
         gameObject.AddComponent<StateMachine>();
 
-        logicStateMachine     = GetComponent<StateMachine>();
+        stateMachine          = GetComponent<StateMachine>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -83,35 +77,26 @@ public class Player : MonoBehaviour
     {
         // TODO: fill logic -> replace null's with methods!!!
 
+        // TODO: rework state machine implementation
+
         // ordinary transitions table
-        logicStateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_TURNING, null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_MOVING,  null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_USING,   null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.IDLE,           null);
+        stateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_TURNING, null);
+        stateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_MOVING,  null);
+        stateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_USING,   null);
+        stateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.IDLE,           null);
 
         // transitions to IDLE
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.IDLE, null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.IDLE, null);
-
-        // transitions to DYING
-        logicStateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_DYING, null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_DYING, null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_DYING, null);
-        logicStateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.PLAYER_DYING, null);
+        stateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.IDLE, null);
+        stateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.IDLE, null);
     }
 
 #endregion
 
 #region public members
 
-    public bool isAlive()
-    {
-        return playerAlive;
-    }
-
     public void lookAt(PlayerInteractionParams interactionParams)
-    {   
-
+    {
+        
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
@@ -134,21 +119,13 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void kill()
-    {
-        // TODO: ...
-    }
-
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
-        if (playerAlive)
-        {
-            doubleClicked = checkForDoubleClick(interactionPoint);
+        doubleClicked = checkForDoubleClick(interactionPoint);
 
-            interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
+        interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
 
-            doubleClicked = false;
-        }
+        doubleClicked = false;
     }
 
 #endregion

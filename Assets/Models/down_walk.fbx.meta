@@ -194,8 +194,9 @@ ModelImporter:
     400184: Wrist_L
     400186: Wrist_R
     4300000: Mesh
-    7400000: Take 001
+    7400000: walk
     9500000: //RootNode
+    11100000: //RootNode
     13700000: Mesh
   materials:
     importMaterials: 1
@@ -213,7 +214,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    animationCompression: 3
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -222,11 +223,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Take 001
+      name: walk
       takeName: Take 001
       firstFrame: 1
       lastFrame: 40
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -294,7 +295,7 @@ ModelImporter:
     hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 1
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

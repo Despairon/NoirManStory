@@ -5,10 +5,10 @@ using UnityEngine;
 public enum FSM_TransitionState
 {
     IDLE,
+    ANY_STATE,
     PLAYER_TURNING,
     PLAYER_MOVING,
     PLAYER_USING,
-    PLAYER_DYING
 
     // add all user states here
 }
@@ -40,24 +40,20 @@ public class StateMachine : MonoBehaviour
 
     private void execute()
     {
-        var nodes = transitionsTable.FindAll(it => it.currentState == state);
-
-        if (nodes != null)
+        foreach (var node in transitionsTable.FindAll(tr => (tr.currentState == state) || (tr.currentState == FSM_TransitionState.ANY_STATE)))
         {
-            foreach (var node in nodes)
+            if (node.transitionRule() == true)
             {
-                if (node.transitionRule() == true)
-                {
-                    state = node.nextState;
-                    break;
-                }
-                else
-                {
-                    if (node.stateAction != null)
-                        node.stateAction();
-                }
+                // transit to next state if transition rule is true
+                state = node.nextState;
+                break;
             }
-        }
+            else
+            {
+                if (node.stateAction != null)
+                    node.stateAction();
+            }
+        }        
     }
 
 #endregion
@@ -66,6 +62,11 @@ public class StateMachine : MonoBehaviour
 
     public delegate bool FSM_TransitionRule();
     public delegate void FSM_StateAction();
+
+    public StateMachine()
+    {
+        transitionsTable = new List<TransitionNode>();
+    }
 
     public FSM_TransitionState state
     {
@@ -106,8 +107,6 @@ public class StateMachine : MonoBehaviour
     {
         state    = FSM_TransitionState.IDLE;
         isActive = false;
-
-        transitionsTable = new List<TransitionNode>();
     }
 
     void FixedUpdate()
