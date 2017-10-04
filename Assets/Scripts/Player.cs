@@ -42,7 +42,6 @@ public class Player : MonoBehaviour
             else
                 result = false;
 
-            // removes game object from displaying, not class object
             Destroy(clickVolumeObjPrev);
         }
         else
@@ -141,11 +140,7 @@ public class Player : MonoBehaviour
     
     private void OnTriggerEnter(Collider collider)
     {
-        if (InteractableObjectsManager.isObjectInteractable(collider.gameObject))
-        {
-            // TODO: action on reaching destination
-
-        }
+        // TODO: action on reaching destination
     }
 
     #endregion
