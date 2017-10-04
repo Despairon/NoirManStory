@@ -16,7 +16,7 @@ public struct PlayerInteractionParams
 
 public class PlayerInteractionsManager
 {
-#region private_members
+    #region private_members
 
     private sealed class InteractionTableItem
     {
@@ -32,9 +32,9 @@ public class PlayerInteractionsManager
 
     private List<InteractionTableItem> playerInteractionTable;
 
-#endregion
+    #endregion
 
-#region public_members
+    #region public_members
 
     public readonly Player player;
 

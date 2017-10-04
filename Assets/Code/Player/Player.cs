@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Player : MonoBehaviour
+public partial class Player : MonoBehaviour
 {
+    #region private_members   
 
-#region private_members   
-
+    private State                      _state;
     private bool                       doubleClicked;
     private GameObject                 clickVolumeObjPrev;
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
-    private StateMachine               stateMachine;
 
     private void setDefaultValues()
     {
+        state                 = State.IDLE;
+
         doubleClicked         = false;
 
         clickVolumeObjPrev    = clickVolumeObjNext = null;
@@ -24,10 +25,6 @@ public class Player : MonoBehaviour
         interactionsManager   = new PlayerInteractionsManager(this);
 
         navigator             = GetComponent<NavMeshAgent>();
-
-        gameObject.AddComponent<StateMachine>();
-
-        stateMachine          = GetComponent<StateMachine>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -72,36 +69,35 @@ public class Player : MonoBehaviour
         // add interactions here...
     }
 
-    private void fillStateMachineTransitions()
+    #endregion
+
+    #region public members
+
+    public enum State
     {
-        // TODO: fill logic -> replace null's with methods!!!
-
-        // TODO: rework state machine implementation
-
-        // ordinary transitions table
-        stateMachine.addNode(FSM_TransitionState.IDLE,           null, FSM_TransitionState.PLAYER_TURNING, null);
-        stateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.PLAYER_MOVING,  null);
-        stateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.PLAYER_USING,   null);
-        stateMachine.addNode(FSM_TransitionState.PLAYER_USING,   null, FSM_TransitionState.IDLE,           null);
-
-        // transitions to IDLE
-        stateMachine.addNode(FSM_TransitionState.PLAYER_TURNING, null, FSM_TransitionState.IDLE, null);
-        stateMachine.addNode(FSM_TransitionState.PLAYER_MOVING,  null, FSM_TransitionState.IDLE, null);
+        IDLE,
+        TURNING,
+        MOVING,
+        USING
     }
 
-#endregion
-
-#region public members
+    public State state
+    {
+        get         { return _state;  }
+        private set { _state = value; }
+    }
 
     public void lookAt(PlayerInteractionParams interactionParams)
     {
-        
+        state = State.TURNING;
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
         if (doubleClicked)
         {
+            state = State.MOVING;
+
             // TODO: use these 
             //navigator.SetDestination(interactionParams.interactionPoint);
             //const float dist_threshold = 10f;
@@ -114,7 +110,7 @@ public class Player : MonoBehaviour
     {
         if (doubleClicked)
         {
-
+            state = State.USING;
         }
     }
 
@@ -127,22 +123,30 @@ public class Player : MonoBehaviour
         doubleClicked = false;
     }
 
-#endregion
+    #endregion
 
-#region unity_defined_methods
+    #region unity_defined_methods
 
-    void Start ()
+    void Start()
     {
         setDefaultValues();
         attachInteractions();
-        fillStateMachineTransitions();
     }
-    
+
+    private void FixedUpdate()
+    {
+        // TODO: ...
+    }
+
+    private void Update()
+    {
+        // TODO: ...
+    }
+
     private void OnTriggerEnter(Collider collider)
     {
-        // TODO: action on reaching destination
+        // TODO: action on reaching destination should be here
     }
 
     #endregion
-
 }

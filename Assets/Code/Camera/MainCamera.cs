@@ -5,7 +5,7 @@ using UnityEngine;
 public class MainCamera : MonoBehaviour
 {
 
-#region private_members
+    #region private_members
 
     private Player  player;
     private Vector3 initialPosition;
@@ -17,14 +17,14 @@ public class MainCamera : MonoBehaviour
                                          player.transform.position.z);
     }
 
-#endregion
+    #endregion
 
 
-#region public_members
+    #region public_members
 
-#endregion
+    #endregion
 
-#region unity_defined_methods
+    #region unity_defined_methods
 
     void Start ()
     {
@@ -52,12 +52,13 @@ public class MainCamera : MonoBehaviour
                     player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
             }
 
-            followPlayer();
+            if (player.state != Player.State.IDLE)
+                followPlayer();
 
             //TODO: ...
         }
 	}
 
-#endregion
+    #endregion
 
 }
