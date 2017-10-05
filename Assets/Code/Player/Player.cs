@@ -13,8 +13,9 @@ public partial class Player : MonoBehaviour
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
+    private GameObject                 targetObject; // TODO: set target object after approppriate interaction!!!
 
-    private void setDefaultValues()
+    private void initializeValues()
     {
         state                 = State.IDLE;
 
@@ -25,6 +26,14 @@ public partial class Player : MonoBehaviour
         interactionsManager   = new PlayerInteractionsManager(this);
 
         navigator             = GetComponent<NavMeshAgent>();
+
+        targetObject          = null;
+
+        playerTurningFSM      = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        playerMovingFSM       = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        playerUsingFSM        = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+
+        stateMachineMap       = new Dictionary<State, PlayerStateMachine>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -129,13 +138,18 @@ public partial class Player : MonoBehaviour
 
     void Start()
     {
-        setDefaultValues();
+        initializeValues();
         attachInteractions();
+        fillStateMachineMap();
+        fillStateMachinesTransitions();
     }
 
     private void FixedUpdate()
     {
-        // TODO: ...
+        if (state != State.IDLE)
+            executeFsmForState(state);
+        else
+            resetStateMachines();
     }
 
     private void Update()

@@ -54,8 +54,6 @@ public class MainCamera : MonoBehaviour
 
             if (player.state != Player.State.IDLE)
                 followPlayer();
-
-            //TODO: ...
         }
 	}
 

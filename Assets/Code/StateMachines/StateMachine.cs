@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class StateMachine<TransitionRuleType, StateActionType>
+public abstract class StateMachine<TransitionRuleType, StateActionArgType>
 {
     #region private_members
 
     private Enum _currentState;
+    private Enum _initialState;
 
     #endregion
 
@@ -16,7 +17,7 @@ public abstract class StateMachine<TransitionRuleType, StateActionType>
 
     protected class TransitionNode
     {
-        public TransitionNode(Enum currentState, TransitionRuleType transitionRule, Enum nextState, StateActionType stateAction)
+        public TransitionNode(Enum currentState, TransitionRuleType transitionRule, Enum nextState, StateAction stateAction)
         {
             this.currentState   = currentState;
             this.transitionRule = transitionRule;
@@ -27,7 +28,7 @@ public abstract class StateMachine<TransitionRuleType, StateActionType>
         public readonly Enum               currentState;
         public readonly TransitionRuleType transitionRule;
         public readonly Enum               nextState;
-        public readonly StateActionType    stateAction;
+        public readonly StateAction        stateAction;
     }
 
     protected List<TransitionNode> transitionsTable;
@@ -42,19 +43,30 @@ public abstract class StateMachine<TransitionRuleType, StateActionType>
         protected set { _currentState = value; }
     }
 
-    public StateMachine()
+    public delegate void StateAction(StateActionArgType arg);
+
+    public StateMachine(Enum initialState)
     {
         transitionsTable = new List<TransitionNode>();
+
+        _initialState = initialState;
+
+        reset();
     }
 
-    public void addNode(Enum currentState, TransitionRuleType transitionRule, Enum nextState, StateActionType stateAction)
+    public void addTransition(Enum currentState, TransitionRuleType transitionRule, Enum nextState, StateAction stateAction)
     {
         var node = new TransitionNode(currentState, transitionRule, nextState, stateAction);
 
         transitionsTable.Add(node);
     }
 
-    public abstract void execute(object data);
+    public abstract void execute(StateActionArgType data);
+
+    public void reset()
+    {
+        currentState = _initialState;
+    }
 
     #endregion
 }
