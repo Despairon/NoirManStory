@@ -41,12 +41,19 @@ public class PlayerStateMachine : StateMachine<PlayerFSM_TransitionRule, GameObj
 
         if (stateTransitions != null)
             foreach(var transition in stateTransitions)
-            {
+            {				
                 if (transition.transitionRule() == true)
+				{
+					// proceed to next state
                     currentState = transition.nextState;
-
-                if (transition.stateAction != null)
-                    transition.stateAction(targetObject);
+					break;
+				}
+				else
+				{
+				    // perform state action
+					if (transition.stateAction != null)
+                        transition.stateAction(targetObject);
+				}
             }
     }
 
