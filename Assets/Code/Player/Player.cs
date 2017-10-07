@@ -65,6 +65,7 @@ public partial class Player : MonoBehaviour
         clickVolumeObj.transform.localScale = new Vector3(50f, 50f, 50f);
         clickVolumeObj.AddComponent<BoxCollider>();
         clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
+        clickVolumeObj.GetComponent<BoxCollider>().isTrigger = true;
         clickVolumeObj.GetComponent<Renderer>().enabled = false; // TODO: change to 'true' for debug cubes to begin being visible
 
         return clickVolumeObj;

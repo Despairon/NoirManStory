@@ -55,7 +55,7 @@ public partial class Player : MonoBehaviour
     private bool checkRotation(GameObject target)
     {
         // TODO: checkRotation: implement
-        Vector3 toRotation   = (transform.position - target.transform.position).normalized;
+        Vector3 toRotation   = (target.transform.position - transform.position).normalized;
         Vector3 fromRotation = transform.forward;
 
         Debug.Log(Vector3.Angle(fromRotation, toRotation)); 
