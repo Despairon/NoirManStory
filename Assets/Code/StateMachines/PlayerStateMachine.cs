@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public delegate bool PlayerFSM_TransitionRule();
+public delegate bool PlayerFSM_TransitionRule(GameObject targetObject);
 
 public class PlayerStateMachine : StateMachine<PlayerFSM_TransitionRule, GameObject>
 {
@@ -16,44 +16,58 @@ public class PlayerStateMachine : StateMachine<PlayerFSM_TransitionRule, GameObj
 
         IDLE,
         TURNING,
+        END_TURNING,
+        SET_MOVING_ANIMATION,
+        START_MOVING,
         MOVING,
-        USING
+        SET_IDLE_ANIMATION,
+        END_MOVING,
+        SET_USING_ANIMATION,
+        START_USING,
+        USING,
+        END_USING,
     }
 
     public PlayerStateMachine(State initialState) : base(initialState) { }
 
-    public override void execute(GameObject targetObject)
+    public override void execute(GameObject target)
     {
         // any state transitions check
-        var anyStateTransitions = transitionsTable.FindAll(transition => transition.currentState == State.ANY_STATE as Enum);
+        var anyStateTransitions = transitionsTable.FindAll(transition => transition.currentState.Equals(State.ANY_STATE as Enum));
 
         if (anyStateTransitions != null)
-            foreach(var transition in anyStateTransitions)
-                if (transition.transitionRule() == true)
+            foreach (var transition in anyStateTransitions)
+            {
+                if (transition.transitionRule != null)
                 {
-                    // proceed to next state
-                    currentState = transition.nextState;
-                    return;
+                    if (transition.transitionRule(target) == true)
+                    {
+                        // proceed to next state
+                        currentState = transition.nextState;
+                        return;
+                    }
                 }
+            }
 
         // ordinary state transitions check
-        var stateTransitions = transitionsTable.FindAll(transition => transition.currentState == currentState);
+        var stateTransitions = transitionsTable.FindAll(transition => transition.currentState.Equals(currentState) );
 
         if (stateTransitions != null)
             foreach(var transition in stateTransitions)
-            {				
-                if (transition.transitionRule() == true)
-				{
-					// proceed to next state
-                    currentState = transition.nextState;
-					break;
-				}
-				else
-				{
-				    // perform state action
-					if (transition.stateAction != null)
-                        transition.stateAction(targetObject);
-				}
+            {
+                // perform state action
+                if (transition.stateAction != null)
+                    transition.stateAction(target);
+
+                if (transition.transitionRule != null)
+                {
+                    if (transition.transitionRule(target) == true)
+                    {
+                        // proceed to next state
+                        currentState = transition.nextState;
+                        break;
+                    }
+                }
             }
     }
 

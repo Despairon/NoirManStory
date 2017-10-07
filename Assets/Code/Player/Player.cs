@@ -99,6 +99,9 @@ public partial class Player : MonoBehaviour
     public void lookAt(PlayerInteractionParams interactionParams)
     {
         state = State.TURNING;
+
+        targetObject = new GameObject("playerRotationTarget");
+        targetObject.transform.position = interactionParams.interactionPoint;
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
@@ -155,11 +158,6 @@ public partial class Player : MonoBehaviour
     private void Update()
     {
         // TODO: ...
-    }
-
-    private void OnTriggerEnter(Collider collider)
-    {
-        // TODO: action on reaching destination should be here
     }
 
     #endregion
