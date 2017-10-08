@@ -130,6 +130,8 @@ public partial class Player : MonoBehaviour
     {
         doubleClicked = checkForDoubleClick(interactionPoint);
 
+        resetStateMachines();
+
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
 
         doubleClicked = false;

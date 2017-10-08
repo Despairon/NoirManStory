@@ -18,6 +18,9 @@ public partial class Player : MonoBehaviour
         playerTurningFSM.reset();
         playerMovingFSM.reset();
         playerUsingFSM.reset();
+
+        Destroy(targetObject);
+        targetObject = null;
     }
 
     private void executeFsmForState(State state)
@@ -54,13 +57,17 @@ public partial class Player : MonoBehaviour
 
     private bool checkRotation(GameObject target)
     {
-        // TODO: checkRotation: implement
+        const float ROTATION_COMPLETE_THRESHOLD = 5; // angles
+
         Vector3 toRotation   = (target.transform.position - transform.position).normalized;
         Vector3 fromRotation = transform.forward;
 
-        Debug.Log(Vector3.Angle(fromRotation, toRotation)); 
+        var angleToTarget = Vector3.Angle(fromRotation, toRotation);
 
-        return true;
+        if (angleToTarget <= ROTATION_COMPLETE_THRESHOLD)
+            return true;
+        else
+            return false;
     }
 
     private bool checkIfTargetIsReached(GameObject target)
@@ -106,7 +113,32 @@ public partial class Player : MonoBehaviour
 
     private void rotateToTarget(GameObject target)
     {
-        // TODO: rotateToTarget: implement
+        const float ROTATION_SPEED = 5.0f;
+
+        if (target != null)
+        {
+            var targetRotation = Quaternion.LookRotation(target.transform.position - transform.position);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, ROTATION_SPEED * Time.fixedDeltaTime);
+
+            // TODO: discuss these two implementations and find out which is better
+
+            //Vector3 toRotation = (target.transform.position - transform.position).normalized;
+            //Vector3 fromRotation = transform.forward;
+
+            //var angleToTarget = Vector3.SignedAngle(fromRotation, toRotation, transform.up);
+
+            /*if (angleToTarget >= 0)
+            {
+                // rotate right
+                transform.Rotate(Vector3.up, ROTATION_SPEED * Time.fixedDeltaTime);
+            }
+            else
+            {
+                // rotate left
+                transform.Rotate(Vector3.up, ROTATION_SPEED * Time.fixedDeltaTime * -1.0f);
+            }*/
+        }
     }
 
     private void startUsingTarget(GameObject target)
@@ -122,9 +154,6 @@ public partial class Player : MonoBehaviour
     private void setStateIdle(GameObject target)
     {
         state = State.IDLE;
-
-        Destroy(targetObject);
-        targetObject = null;
     }
 
     #endregion
