@@ -13,7 +13,7 @@ public partial class Player : MonoBehaviour
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
-    private GameObject                 targetObject; // TODO: set target object after approppriate interaction!!!
+    private GameObject                 targetObject;
 
     private void initializeValues()
     {
@@ -72,9 +72,9 @@ public partial class Player : MonoBehaviour
 
     private void attachInteractions()
     {
-        interactionsManager.addInteraction(InteractableObjectType.WALL,  new PlayerInteractionsManager.PlayerInteraction(lookAt));
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(lookAt));
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, new PlayerInteractionsManager.PlayerInteraction(moveTo));
+        interactionsManager.addInteraction(InteractableObjectType.WALL,  lookAt);
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, lookAt);
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, moveTo);
         // add interactions here...
     }
 
@@ -110,11 +110,8 @@ public partial class Player : MonoBehaviour
         {
             state = State.MOVING;
 
-            // TODO: use these 
-            //navigator.SetDestination(interactionParams.interactionPoint);
-            //const float dist_threshold = 10f;
-            //if (navigator.remainingDistance <= dist_threshold)
-            //    animationStateMachine.SetTrigger("movingEnded");
+            targetObject = new GameObject("playerMovementTarget");
+            targetObject.transform.position = interactionParams.interactionPoint;
         }
     }
 
@@ -123,6 +120,9 @@ public partial class Player : MonoBehaviour
         if (doubleClicked)
         {
             state = State.USING;
+
+            targetObject = Instantiate(interactionParams.obj);
+            targetObject.GetComponent<Renderer>().enabled = false;
         }
     }
 
@@ -131,6 +131,7 @@ public partial class Player : MonoBehaviour
         doubleClicked = checkForDoubleClick(interactionPoint);
 
         resetStateMachines();
+        // TODO: fix resetting state machine
 
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
 

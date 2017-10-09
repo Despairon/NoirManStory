@@ -21,6 +21,8 @@ public partial class Player : MonoBehaviour
 
         Destroy(targetObject);
         targetObject = null;
+
+        navigator.isStopped = true;
     }
 
     private void executeFsmForState(State state)
@@ -72,8 +74,12 @@ public partial class Player : MonoBehaviour
 
     private bool checkIfTargetIsReached(GameObject target)
     {
-        //TODO: checkIfTargetIsReached: implement
-        return true;
+        const float dist_threshold = 10f;
+
+        if (navigator.remainingDistance <= dist_threshold)
+            return true;
+        else
+            return false;
     }
 
     private bool isUsingEnded(GameObject target)
@@ -108,7 +114,8 @@ public partial class Player : MonoBehaviour
 
     private void startMovingToTarget(GameObject target)
     {
-        // TODO: startMovingToTarget: implement
+        navigator.SetDestination(target.transform.position);
+        navigator.isStopped = false;
     }
 
     private void rotateToTarget(GameObject target)
@@ -160,8 +167,6 @@ public partial class Player : MonoBehaviour
 
     private void fillStateMachinesTransitions()
     {
-        // TODO: complete state machines -> replace null's with callbacks!!!
-
         // player turning state machine transitions table section
         playerTurningFSM.addTransition(PlayerStateMachine.State.IDLE,                emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
         playerTurningFSM.addTransition(PlayerStateMachine.State.TURNING,             checkRotation,          PlayerStateMachine.State.END_TURNING,          rotateToTarget);
