@@ -8,17 +8,16 @@ public class MainCamera : MonoBehaviour
     #region private_members
 
     private Player  player;
-    private Vector3 initialPosition;
+    private Vector3 offsetFromPlayer;
 
     private void followPlayer()
     {
-        transform.position = new Vector3(player.transform.position.x,
-                                         initialPosition.y,
-                                         player.transform.position.z);
+        transform.position = new Vector3(player.transform.position.x + offsetFromPlayer.x,
+                                         offsetFromPlayer.y,
+                                         player.transform.position.z + offsetFromPlayer.z);
     }
-
+    
     #endregion
-
 
     #region public_members
 
@@ -33,7 +32,7 @@ public class MainCamera : MonoBehaviour
         if (playerObj != null)
             player = playerObj.GetComponent<Player>();
 
-        initialPosition = transform.position;
+        offsetFromPlayer = transform.position - player.transform.position;
 
         if (player != null) followPlayer();
     }
