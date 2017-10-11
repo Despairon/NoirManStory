@@ -22,6 +22,7 @@ public partial class Player : MonoBehaviour
         Destroy(targetObject);
         targetObject = null;
 
+        navigator.destination = transform.position;
         navigator.isStopped = true;
     }
 
@@ -76,8 +77,10 @@ public partial class Player : MonoBehaviour
     {
         const float dist_threshold = 10f;
 
-        if (navigator.remainingDistance <= dist_threshold)
+        if (!navigator.pathPending && (navigator.remainingDistance <= dist_threshold))
+        {
             return true;
+        }
         else
             return false;
     }
@@ -114,7 +117,7 @@ public partial class Player : MonoBehaviour
 
     private void startMovingToTarget(GameObject target)
     {
-        navigator.SetDestination(target.transform.position);
+        navigator.destination = target.transform.position;
         navigator.isStopped = false;
     }
 

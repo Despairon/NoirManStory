@@ -72,9 +72,9 @@ public partial class Player : MonoBehaviour
 
     private void attachInteractions()
     {
-        interactionsManager.addInteraction(InteractableObjectType.WALL,  lookAt);
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, lookAt);
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, moveTo);
+        interactionsManager.addInteraction(InteractableObjectType.WALL,  lookAt, InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, lookAt, InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR, moveTo, InputAction.DOUBLE_TAP);
         // add interactions here...
     }
 
@@ -131,9 +131,9 @@ public partial class Player : MonoBehaviour
         doubleClicked = checkForDoubleClick(interactionPoint);
 
         resetStateMachines();
-        // TODO: fix resetting state machine
 
-        interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint));
+        // TODO: add proper input manager to handle taps - double taps
+        interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
         doubleClicked = false;
     }

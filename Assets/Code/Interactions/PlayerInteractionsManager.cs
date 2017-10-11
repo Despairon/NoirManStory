@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: when proper input manager created - move there
+public enum InputAction
+{
+    NONE,
+    SINGLE_TAP,
+    DOUBLE_TAP
+}
+
 public struct PlayerInteractionParams
 {
     public readonly GameObject obj;
@@ -20,14 +28,16 @@ public class PlayerInteractionsManager
 
     private sealed class InteractionTableItem
     {
-        public InteractionTableItem(InteractableObjectType interactionType, PlayerInteraction interact)
+        public InteractionTableItem(InteractableObjectType interactionType, PlayerInteraction interact, InputAction inputAction)
         {
             this.interactionType = interactionType;
             this.interact        = interact;
+            this.inputAction     = inputAction;
         }
 
         public readonly InteractableObjectType interactionType;
         public readonly PlayerInteraction      interact;
+        public readonly InputAction            inputAction;
     }
 
     private List<InteractionTableItem> playerInteractionTable;
@@ -47,19 +57,22 @@ public class PlayerInteractionsManager
         playerInteractionTable = new List<InteractionTableItem>();
     }
 
-    public void addInteraction(InteractableObjectType interactionType, PlayerInteraction interact)
+    public void addInteraction(InteractableObjectType interactionType, PlayerInteraction interact, InputAction inputAction)
     {
-        playerInteractionTable.Add(new InteractionTableItem(interactionType, interact));
+        playerInteractionTable.Add(new InteractionTableItem(interactionType, interact, inputAction));
     }
 
     
-     public void interactWith(PlayerInteractionParams interactionParams)
+     public void interactWith(PlayerInteractionParams interactionParams, InputAction inputAction)
      {
         if (InteractableObjectsManager.isObjectInteractable(interactionParams.obj))
         {
             var interactionType = InteractableObjectsManager.getInteractionType(interactionParams.obj);
 
-            foreach (var interactionTableItem in playerInteractionTable.FindAll(interaction => interaction.interactionType == interactionType))
+            var interactionTableItems = playerInteractionTable.FindAll(interaction => (interaction.interactionType == interactionType)
+                                                                                   && (interaction.inputAction     == inputAction));
+
+            foreach (var interactionTableItem in interactionTableItems)
                 if (interactionTableItem.interact != null)
                     interactionTableItem.interact(interactionParams);
         }
