@@ -13,6 +13,7 @@ public partial class Player : MonoBehaviour
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
+    private Animation                  animationComponent;
     private GameObject                 targetObject;
 
     private void initializeValues()
@@ -33,7 +34,11 @@ public partial class Player : MonoBehaviour
         playerMovingFSM       = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
         playerUsingFSM        = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
 
+        animationComponent    = GetComponent<Animation>();
+
         stateMachineMap       = new Dictionary<State, PlayerStateMachine>();
+
+        playerAnimationMap    = new List<PlayerAnimationMapNode>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -146,6 +151,7 @@ public partial class Player : MonoBehaviour
     {
         initializeValues();
         attachInteractions();
+        fillAnimationMap();
         fillStateMachineMap();
         fillStateMachinesTransitions();
     }

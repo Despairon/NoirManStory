@@ -21,9 +21,11 @@ public partial class Player : MonoBehaviour
 
         Destroy(targetObject);
         targetObject = null;
-
+        
         navigator.destination = transform.position;
         navigator.isStopped = true;
+
+        setIdleAnimation(null);
     }
 
     private void executeFsmForState(State state)
@@ -102,11 +104,15 @@ public partial class Player : MonoBehaviour
 
     private void setIdleAnimation(GameObject target)
     {
+        if (!isAnimActive(PlayerAnimation.IDLE))
+            playAnim(PlayerAnimation.IDLE);
         // TODO: setIdleAnimation
     }
 
     private void setMovingAnimation(GameObject target)
     {
+        if (!isAnimActive(PlayerAnimation.WALKING))
+            playAnim(PlayerAnimation.WALKING);
         // TODO: setMovingAnimation: implement
     }
 
@@ -196,11 +202,6 @@ public partial class Player : MonoBehaviour
         playerUsingFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_USING,            setIdleAnimation);
         playerUsingFSM.addTransition(PlayerStateMachine.State.END_USING,            emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
     }
-
-    #endregion
-
-
-    #region public_members
 
     #endregion
 }
