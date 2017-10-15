@@ -6,7 +6,8 @@ public enum InteractableObjectType
 {
     INVALID = 0,
     FLOOR,
-    WALL
+    WALL,
+	DOOR
     // add types here
 }
 
@@ -17,7 +18,8 @@ public static class InteractableObjectsManager
     private static Dictionary<string, InteractableObjectType> interactableObjectsMap = new Dictionary<string, InteractableObjectType>()
     {
         { "Floor", InteractableObjectType.FLOOR },
-        { "Wall",  InteractableObjectType.WALL  }
+        { "Wall",  InteractableObjectType.WALL  },
+		{ "Door",  InteractableObjectType.DOOR  }
     };
 
     #endregion

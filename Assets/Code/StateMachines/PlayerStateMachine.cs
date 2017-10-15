@@ -32,26 +32,9 @@ public class PlayerStateMachine : StateMachine<PlayerFSM_TransitionRule, GameObj
 
     public override void execute(GameObject target)
     {
-        // any state transitions check
-        var anyStateTransitions = transitionsTable.FindAll(transition => transition.currentState.Equals(State.ANY_STATE as Enum));
-
-        if (anyStateTransitions != null)
-            foreach (var transition in anyStateTransitions)
-            {
-                if (transition.transitionRule != null)
-                {
-                    if (transition.transitionRule(target) == true)
-                    {
-                        // proceed to next state
-                        currentState = transition.nextState;
-                        return;
-                    }
-                }
-            }
-
-        // ordinary state transitions check
-        var stateTransitions = transitionsTable.FindAll(transition => transition.currentState.Equals(currentState) );
-
+		var stateTransitions = transitionsTable.FindAll(transition => transition.currentState.Equals(currentState)
+			                                                       || transition.currentState.Equals(State.ANY_STATE as Enum));
+		
         if (stateTransitions != null)
             foreach(var transition in stateTransitions)
             {
