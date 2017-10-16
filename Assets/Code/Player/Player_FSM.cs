@@ -65,6 +65,7 @@ public partial class Player : MonoBehaviour
         const float ROTATION_COMPLETE_THRESHOLD = 5; // angles
 
         Vector3 toRotation   = (target.transform.position - transform.position).normalized;
+        toRotation.y = 0;
         Vector3 fromRotation = transform.forward;
 
         var angleToTarget = Vector3.Angle(fromRotation, toRotation);
@@ -77,7 +78,7 @@ public partial class Player : MonoBehaviour
 
     private bool checkIfTargetIsReached(GameObject target)
     {
-        const float dist_threshold = 10f;
+        const float dist_threshold = 0.5f;
 
         if (!navigator.pathPending && (navigator.remainingDistance <= dist_threshold))
         {

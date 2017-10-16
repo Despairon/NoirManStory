@@ -67,7 +67,7 @@ public partial class Player : MonoBehaviour
     {
         var clickVolumeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
         clickVolumeObj.transform.position = point;
-        clickVolumeObj.transform.localScale = new Vector3(50f, 50f, 50f);
+        clickVolumeObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
         clickVolumeObj.GetComponent<BoxCollider>().isTrigger = true;
         clickVolumeObj.GetComponent<Renderer>().enabled = false; // TODO: change to 'true' for debug cubes to begin being visible
@@ -98,37 +98,37 @@ public partial class Player : MonoBehaviour
 
     public State state
     {
-        get         { return _state;  }
-        private set { _state = value; }
+        get         {  return _state;  }
+        private set { _state = value;  }
     }
 
     public void lookAt(PlayerInteractionParams interactionParams)
     {
-        state = State.TURNING;
-
         targetObject = new GameObject("playerRotationTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
+
+        state = State.TURNING;
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
         if (doubleClicked)
         {
-            state = State.MOVING;
-
             targetObject = new GameObject("playerMovementTarget");
             targetObject.transform.position = interactionParams.interactionPoint;
+
+            state = State.MOVING;
         }
     }
 
     public void useIt(PlayerInteractionParams interactionParams)
     {
         if (doubleClicked)
-        {
-            state = State.USING;
-
+        {        
             targetObject = Instantiate(interactionParams.obj);
             targetObject.GetComponent<Renderer>().enabled = false;
+
+            state = State.USING;
         }
     }
 
@@ -159,7 +159,7 @@ public partial class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (state != State.IDLE)
+        if ( (state != State.IDLE) && (targetObject != null) )
             executeFsmForState(state);
         else
             resetStateMachines();
