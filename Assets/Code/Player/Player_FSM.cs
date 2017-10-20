@@ -9,7 +9,7 @@ public partial class Player : MonoBehaviour
 
     private PlayerStateMachine playerTurningFSM;
     private PlayerStateMachine playerMovingFSM;
-    private PlayerStateMachine playerUsingFSM;
+    private PlayerStateMachine playerInteractiveSearchFSM;
 
     private Dictionary<State, PlayerStateMachine> stateMachineMap;
 
@@ -17,7 +17,7 @@ public partial class Player : MonoBehaviour
     {
         playerTurningFSM.reset();
         playerMovingFSM.reset();
-        playerUsingFSM.reset();
+        playerInteractiveSearchFSM.reset();
 
         Destroy(targetObject);
         targetObject = null;
@@ -47,9 +47,9 @@ public partial class Player : MonoBehaviour
 
     private void fillStateMachineMap()
     {
-        stateMachineMap.Add(State.TURNING, playerTurningFSM);
-        stateMachineMap.Add(State.MOVING,  playerMovingFSM);
-        stateMachineMap.Add(State.USING,   playerUsingFSM);
+        stateMachineMap.Add(State.TURNING,                 playerTurningFSM);
+        stateMachineMap.Add(State.MOVING,                  playerMovingFSM);
+        stateMachineMap.Add(State.INTERACTIVE_SEARCHING,   playerInteractiveSearchFSM);
     }
 
     #region player_fsm_transition_rules
@@ -90,8 +90,12 @@ public partial class Player : MonoBehaviour
 
     private bool isUsingEnded(GameObject target)
     {
-        //TODO: isUsingEnded: implement
-        return true;
+        //TODO: isUsingEnded: implement and remove temporary implementation!!!
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            return true;
+        else
+            return false;
     }
 
     #endregion
@@ -107,19 +111,18 @@ public partial class Player : MonoBehaviour
     {
         if (!isAnimActive(PlayerAnimation.IDLE))
             playAnim(PlayerAnimation.IDLE);
-        // TODO: setIdleAnimation
     }
 
     private void setMovingAnimation(GameObject target)
     {
         if (!isAnimActive(PlayerAnimation.WALKING))
             playAnim(PlayerAnimation.WALKING);
-        // TODO: setMovingAnimation: implement
     }
 
     private void setUsingAnimation(GameObject target)
     {
-        // TODO: setUsingAnimation: implement
+        if (!isAnimActive(PlayerAnimation.USING))
+            playAnim(PlayerAnimation.USING);
     }
 
     private void startMovingToTarget(GameObject target)
@@ -137,35 +140,12 @@ public partial class Player : MonoBehaviour
             var targetRotation = Quaternion.LookRotation(target.transform.position - transform.position);
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, ROTATION_SPEED * Time.fixedDeltaTime);
-
-            // TODO: discuss these two implementations and find out which is better
-
-            //Vector3 toRotation = (target.transform.position - transform.position).normalized;
-            //Vector3 fromRotation = transform.forward;
-
-            //var angleToTarget = Vector3.SignedAngle(fromRotation, toRotation, transform.up);
-
-            /*if (angleToTarget >= 0)
-            {
-                // rotate right
-                transform.Rotate(Vector3.up, ROTATION_SPEED * Time.fixedDeltaTime);
-            }
-            else
-            {
-                // rotate left
-                transform.Rotate(Vector3.up, ROTATION_SPEED * Time.fixedDeltaTime * -1.0f);
-            }*/
         }
     }
 
-    private void startUsingTarget(GameObject target)
+    private void startInteractiveSearch(GameObject target)
     {
         // TODO: startUsingTarget: implement
-    }
-
-    private void usingTarget(GameObject target)
-    {
-        // TODO: usingTarget: implement
     }
 
     private void setStateIdle(GameObject target)
@@ -191,17 +171,17 @@ public partial class Player : MonoBehaviour
         playerMovingFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_MOVING,           setIdleAnimation);
         playerMovingFSM.addTransition(PlayerStateMachine.State.END_MOVING,           emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
 
-        // player using state machine transitions table section
-        playerUsingFSM.addTransition(PlayerStateMachine.State.IDLE,                 emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.TURNING,              checkRotation,          PlayerStateMachine.State.SET_MOVING_ANIMATION, rotateToTarget);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.SET_MOVING_ANIMATION, emptyTransitionRule,    PlayerStateMachine.State.START_MOVING,         setMovingAnimation);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.START_MOVING,         emptyTransitionRule,    PlayerStateMachine.State.MOVING,               startMovingToTarget);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.MOVING,               checkIfTargetIsReached, PlayerStateMachine.State.SET_USING_ANIMATION,  emptyAction);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.SET_USING_ANIMATION,  emptyTransitionRule,    PlayerStateMachine.State.START_USING,          setUsingAnimation);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.START_USING,          emptyTransitionRule,    PlayerStateMachine.State.USING,                startUsingTarget);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.USING,                isUsingEnded,           PlayerStateMachine.State.SET_IDLE_ANIMATION,   usingTarget);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_USING,            setIdleAnimation);
-        playerUsingFSM.addTransition(PlayerStateMachine.State.END_USING,            emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
+        // player interactive search state machine transitions table section
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.IDLE,                 emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.TURNING,              checkRotation,          PlayerStateMachine.State.SET_MOVING_ANIMATION, rotateToTarget);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_MOVING_ANIMATION, emptyTransitionRule,    PlayerStateMachine.State.START_MOVING,         setMovingAnimation);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.START_MOVING,         emptyTransitionRule,    PlayerStateMachine.State.MOVING,               startMovingToTarget);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.MOVING,               checkIfTargetIsReached, PlayerStateMachine.State.SET_USING_ANIMATION,  emptyAction);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_USING_ANIMATION,  emptyTransitionRule,    PlayerStateMachine.State.START_USING,          setUsingAnimation);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.START_USING,          emptyTransitionRule,    PlayerStateMachine.State.USING,                startInteractiveSearch);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.USING,                isUsingEnded,           PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyAction);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_USING,            setIdleAnimation);
+        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.END_USING,            emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
     }
 
     #endregion

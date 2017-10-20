@@ -32,7 +32,7 @@ public partial class Player : MonoBehaviour
 
         playerTurningFSM      = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
         playerMovingFSM       = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-        playerUsingFSM        = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        playerInteractiveSearchFSM        = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
 
         animationComponent    = GetComponent<Animation>();
 
@@ -77,10 +77,11 @@ public partial class Player : MonoBehaviour
 
     private void attachInteractions()
     {
-        interactionsManager.addInteraction(InteractableObjectType.WALL,  lookAt, InputAction.SINGLE_TAP);
-		interactionsManager.addInteraction(InteractableObjectType.FLOOR, lookAt, InputAction.SINGLE_TAP);
-        interactionsManager.addInteraction(InteractableObjectType.FLOOR, moveTo, InputAction.DOUBLE_TAP);
-		interactionsManager.addInteraction(InteractableObjectType.DOOR,  useIt,  InputAction.DOUBLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.WALL,                    lookAt,            InputAction.SINGLE_TAP);
+		interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   lookAt,            InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  lookAt,            InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   moveTo,            InputAction.DOUBLE_TAP);
+		interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  interactiveSearch, InputAction.DOUBLE_TAP);
         // add interactions here...
     }
 
@@ -93,7 +94,7 @@ public partial class Player : MonoBehaviour
         IDLE,
         TURNING,
         MOVING,
-        USING
+        INTERACTIVE_SEARCHING
     }
 
     public State state
@@ -112,24 +113,21 @@ public partial class Player : MonoBehaviour
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
-        if (doubleClicked)
-        {
-            targetObject = new GameObject("playerMovementTarget");
-            targetObject.transform.position = interactionParams.interactionPoint;
+        targetObject = new GameObject("playerMovementTarget");
+        targetObject.transform.position = interactionParams.interactionPoint;
 
-            state = State.MOVING;
-        }
+        state = State.MOVING;
     }
 
-    public void useIt(PlayerInteractionParams interactionParams)
+    public void interactiveSearch(PlayerInteractionParams interactionParams)
     {
-        if (doubleClicked)
-        {        
-            targetObject = Instantiate(interactionParams.obj);
-            targetObject.GetComponent<Renderer>().enabled = false;
+        targetObject = Instantiate(interactionParams.obj);
 
-            state = State.USING;
-        }
+        targetObject.transform.position = interactionParams.interactionPoint; // TODO: REMOVE HACK! need to use original object position, but its all zeros now!
+
+        targetObject.GetComponent<Renderer>().enabled = true;
+
+        state = State.INTERACTIVE_SEARCHING;
     }
 
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)

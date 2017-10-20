@@ -70,8 +70,8 @@ public class PlayerInteractionsManager
             var interactionType = InteractableObjectsManager.getInteractionType(interactionParams.obj);
 
             var interactionTableItems = playerInteractionTable.FindAll(interaction => (interaction.interactionType == interactionType)
-                                                                                   && ((interaction.inputAction == inputAction)
-                                                                                   || (interaction.inputAction == InputAction.NONE)));
+                                                                                   && ((interaction.inputAction    == inputAction)
+                                                                                   || (interaction.inputAction     == InputAction.NONE)));
 
             foreach (var interactionTableItem in interactionTableItems)
                 if (interactionTableItem.interact != null)

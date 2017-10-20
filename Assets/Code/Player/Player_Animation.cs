@@ -5,8 +5,6 @@ using UnityEngine.AI;
 
 public partial class Player : MonoBehaviour
 {
-    // TODO: implement animation control here!
-
     #region private_members
 
     private enum PlayerAnimation
@@ -37,7 +35,7 @@ public partial class Player : MonoBehaviour
     {
         playerAnimationMap.Add(new PlayerAnimationMapNode("PlayerIdle",  PlayerAnimation.IDLE,    0.75f));
         playerAnimationMap.Add(new PlayerAnimationMapNode("walk",        PlayerAnimation.WALKING, 2.0f));
-        playerAnimationMap.Add(new PlayerAnimationMapNode("PlayerUsing", PlayerAnimation.USING,   1.0f));
+        playerAnimationMap.Add(new PlayerAnimationMapNode("PlayerUsing", PlayerAnimation.USING,   1.5f));
     }
 
     private bool isAnimActive(PlayerAnimation anim)
@@ -57,7 +55,8 @@ public partial class Player : MonoBehaviour
         if (_anim != null)
         {
             animationComponent[_anim.animationName].speed = _anim.animationSpeed;
-            animationComponent.Play(_anim.animationName);
+
+            animationComponent.CrossFade(_anim.animationName); // TODO: fix!!! maybe rework animation manager
         }
     }
 

@@ -7,7 +7,8 @@ public enum InteractableObjectType
     INVALID = 0,
     FLOOR,
     WALL,
-	DOOR
+	DOOR,
+    INTERACTIVE_SEARCHABLE
     // add types here
 }
 
@@ -17,9 +18,10 @@ public static class InteractableObjectsManager
 
     private static Dictionary<string, InteractableObjectType> interactableObjectsMap = new Dictionary<string, InteractableObjectType>()
     {
-        { "Floor", InteractableObjectType.FLOOR },
-        { "Wall",  InteractableObjectType.WALL  },
-		{ "Door",  InteractableObjectType.DOOR  }
+        { "Floor",                 InteractableObjectType.FLOOR                  },
+        { "Wall",                  InteractableObjectType.WALL                   },
+		{ "Door",                  InteractableObjectType.DOOR                   },
+        { "InteractiveSearchable", InteractableObjectType.INTERACTIVE_SEARCHABLE }
     };
 
     #endregion
