@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: when proper input manager created - move there
+
 public enum InputAction
 {
     NONE,

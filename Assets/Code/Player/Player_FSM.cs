@@ -109,20 +109,17 @@ public partial class Player : MonoBehaviour
 
     private void setIdleAnimation(GameObject target)
     {
-        if (!isAnimActive(PlayerAnimation.IDLE))
-            playAnim(PlayerAnimation.IDLE);
+        playAnim(PlayerAnimation.IDLE);
     }
 
     private void setMovingAnimation(GameObject target)
     {
-        if (!isAnimActive(PlayerAnimation.WALKING))
-            playAnim(PlayerAnimation.WALKING);
+        playAnim(PlayerAnimation.WALKING);
     }
 
     private void setUsingAnimation(GameObject target)
     {
-        if (!isAnimActive(PlayerAnimation.USING))
-            playAnim(PlayerAnimation.USING);
+        playAnim(PlayerAnimation.USING);
     }
 
     private void startMovingToTarget(GameObject target)

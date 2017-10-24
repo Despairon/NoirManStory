@@ -13,32 +13,33 @@ public partial class Player : MonoBehaviour
     private GameObject                 clickVolumeObjNext;
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
-    private Animation                  animationComponent;
+    private Animator                   animator;
     private GameObject                 targetObject;
 
     private void initializeValues()
     {
-        state                 = State.IDLE;
+        state                      = State.IDLE;
 
-        doubleClicked         = false;
+        doubleClicked              = false;
 
-        clickVolumeObjPrev    = clickVolumeObjNext = null;
+        clickVolumeObjPrev         = clickVolumeObjNext = null;
 
-        interactionsManager   = new PlayerInteractionsManager(this);
+        interactionsManager        = new PlayerInteractionsManager(this);
 
-        navigator             = GetComponent<NavMeshAgent>();
+        navigator                  = GetComponent<NavMeshAgent>();
 
-        targetObject          = null;
+        targetObject               = null;
 
-        playerTurningFSM      = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-        playerMovingFSM       = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-        playerInteractiveSearchFSM        = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        animator                   = GetComponent<Animator>();
 
-        animationComponent    = GetComponent<Animation>();
+        playerTurningFSM           = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        playerMovingFSM            = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
+        playerInteractiveSearchFSM = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
 
-        stateMachineMap       = new Dictionary<State, PlayerStateMachine>();
+        stateMachineMap            = new Dictionary<State, PlayerStateMachine>();
 
-        playerAnimationMap    = new List<PlayerAnimationMapNode>();
+        currentAnimation           = PlayerAnimation.NONE;
+        playerAnimationMap         = new Dictionary<PlayerAnimation, string>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -136,7 +137,6 @@ public partial class Player : MonoBehaviour
 
         resetStateMachines();
 
-        // TODO: add proper input manager to handle taps - double taps and else
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
         doubleClicked = false;
@@ -161,11 +161,6 @@ public partial class Player : MonoBehaviour
             executeFsmForState(state);
         else
             resetStateMachines();
-    }
-
-    private void Update()
-    {
-        // TODO: ...
     }
 
     #endregion

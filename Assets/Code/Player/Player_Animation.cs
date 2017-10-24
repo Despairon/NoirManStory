@@ -15,58 +15,36 @@ public partial class Player : MonoBehaviour
         USING
     }
 
-    private sealed class PlayerAnimationMapNode
-    {
-        public PlayerAnimationMapNode(string animationName, PlayerAnimation anim, float animationSpeed)
-        {
-            this.animationName  = animationName;
-            this.anim           = anim;
-            this.animationSpeed = animationSpeed;
-        }
+    private PlayerAnimation currentAnimation;
 
-        public readonly string          animationName;
-        public readonly PlayerAnimation anim;    
-        public readonly float           animationSpeed;  
-    }
-
-    private List<PlayerAnimationMapNode> playerAnimationMap;
+    private Dictionary<PlayerAnimation, string> playerAnimationMap;
 
     private void fillAnimationMap()
     {
-        playerAnimationMap.Add(new PlayerAnimationMapNode("PlayerIdle",  PlayerAnimation.IDLE,    0.75f));
-        playerAnimationMap.Add(new PlayerAnimationMapNode("walk",        PlayerAnimation.WALKING, 2.0f));
-        playerAnimationMap.Add(new PlayerAnimationMapNode("PlayerUsing", PlayerAnimation.USING,   1.5f));
+        playerAnimationMap.Add( PlayerAnimation.IDLE    , "IdleAnimSet"    );
+        playerAnimationMap.Add( PlayerAnimation.WALKING , "WalkingAnimSet" );
+        playerAnimationMap.Add( PlayerAnimation.USING   , "UsingAnimSet"   );
     }
 
-    private bool isAnimActive(PlayerAnimation anim)
+    private void playAnim(PlayerAnimation animation)
     {
-        var _anim = playerAnimationMap.Find(node => node.anim == anim);
-
-        if (_anim != null)
-            return animationComponent.IsPlaying(_anim.animationName);
-        else
-            return false;
-    }
-
-    private void playAnim(PlayerAnimation anim)
-    {
-        var _anim = playerAnimationMap.Find(node => node.anim == anim);
-
-        if (_anim != null)
+        if (currentAnimation != animation)
         {
-            animationComponent[_anim.animationName].speed = _anim.animationSpeed;
+            try
+            {
+                var animControlTrigger = playerAnimationMap[animation];
 
-            animationComponent.CrossFade(_anim.animationName); // TODO: fix!!! maybe rework animation manager
-        }
-    }
+                if (animControlTrigger != null)
+                {
+                    animator.SetTrigger(animControlTrigger);
 
-    private void stopAnim(PlayerAnimation anim)
-    {
-        var _anim = playerAnimationMap.Find(node => node.anim == anim);
-
-        if (_anim != null)
-        {
-            animationComponent.Stop(_anim.animationName);
+                    currentAnimation = animation;
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                // do nothing
+            }
         }
     }
 
