@@ -92,6 +92,7 @@
     <Compile Include="Assets\Code\Camera\MainCamera.cs" />
     <Compile Include="Assets\Code\Events\Event.cs" />
     <Compile Include="Assets\Code\Events\EventsManager.cs" />
+    <Compile Include="Assets\Code\Events\IEventReceiver.cs" />
     <Compile Include="Assets\Code\Interactions\InteractableObjectsManager.cs" />
     <Compile Include="Assets\Code\Interactions\PlayerInteractionsManager.cs" />
     <Compile Include="Assets\Code\Player\Player.cs" />

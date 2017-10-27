@@ -6,31 +6,26 @@ using System.Text;
 public enum EventID
 {
     NONE,
+    PLAYER_INTERNAL_EVENT
 };
 
-public class EventData
+public abstract class EventData
 {
-    // TODO: ...
+    EventData() { }
 }
-
-public delegate void EventHandlers(Enum eventID, EventData eventData);
 
 public class Event
 {
-    #region private_members
-
-    private Enum          _eventID;
-    private EventData     _eventData;
-    private EventHandlers _eventHandlers;
-
-    #endregion
-
     #region public_members
 
-    public void GC()
+    public Event(EventID eventID, EventData eventData)
     {
-       
+        this.eventID   = eventID;
+        this.eventData = eventData;
     }
+
+    public readonly EventID   eventID;
+    public readonly EventData eventData;
 
     #endregion
 }

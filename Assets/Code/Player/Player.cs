@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public partial class Player : MonoBehaviour
+public partial class Player : MonoBehaviour, IEventReceiver
 {
     #region private_members   
 
@@ -142,6 +142,21 @@ public partial class Player : MonoBehaviour
         doubleClicked = false;
     }
 
+    public void receiveEvent(Event evt)
+    {
+        switch (evt.eventID)
+        {
+            case EventID.PLAYER_INTERNAL_EVENT:
+                Debug.Log("player internal event received: ");
+                break;
+
+            default:
+                Debug.Log("unhandled event received: " + evt.eventID.ToString());
+                break;
+        }
+        //TODO: receiveEvent: implement
+    }
+
     #endregion
 
     #region unity_defined_methods
@@ -162,6 +177,8 @@ public partial class Player : MonoBehaviour
         else
             resetStateMachines();
     }
+
+    private float deltaTime = 0.0f;
 
     #endregion
 }
