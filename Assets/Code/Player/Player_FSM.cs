@@ -7,178 +7,133 @@ public partial class Player : MonoBehaviour
 {
     #region private_members
 
-    private PlayerStateMachine playerTurningFSM;
-    private PlayerStateMachine playerMovingFSM;
-    private PlayerStateMachine playerInteractiveSearchFSM;
+    private PlayerStateMachine playerFSM;
 
-    private Dictionary<State, PlayerStateMachine> stateMachineMap;
+    #region player_fsm_state_actions
 
-    private void resetStateMachines()
-    {
-        playerTurningFSM.reset();
-        playerMovingFSM.reset();
-        playerInteractiveSearchFSM.reset();
-
-        Destroy(targetObject);
-        targetObject = null;
-        
-        navigator.destination = transform.position;
-        navigator.isStopped = true;
-
-        setIdleAnimation(null);
-    }
-
-    private void executeFsmForState(State state)
-    {
-        try
-        {
-            var stateMachine = stateMachineMap[state];
-
-            if (stateMachine != null)
-            {
-                stateMachine.execute(targetObject);
-            }
-        }
-        catch (KeyNotFoundException)
-        {
-            // do nothing
-        }
-    }
-
-    private void fillStateMachineMap()
-    {
-        stateMachineMap.Add(State.TURNING,                 playerTurningFSM);
-        stateMachineMap.Add(State.MOVING,                  playerMovingFSM);
-        stateMachineMap.Add(State.INTERACTIVE_SEARCHING,   playerInteractiveSearchFSM);
-    }
-
-    #region player_fsm_transition_rules
-
-    private bool emptyTransitionRule(GameObject target)
+    private void emptyAction(PlayerFsmExecData execData)
     {
         // do nothing
-        return true;
     }
 
-    private bool checkRotation(GameObject target)
+    private void setPlayerIdle(PlayerFsmExecData execData)
+    {
+        resetTarget();
+
+        setIdleAnimation(execData);
+
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_IDLING, execData.target));
+    }
+
+    private void checkRotation(PlayerFsmExecData execData)
     {
         const float ROTATION_COMPLETE_THRESHOLD = 5; // angles
 
-        Vector3 toRotation   = (target.transform.position - transform.position).normalized;
-        toRotation.y = 0;
-        Vector3 fromRotation = transform.forward;
+        if (execData.target != null)
+        {
+            Vector3 toRotation = (execData.target.transform.position - transform.position).normalized;
+            toRotation.y = 0;
+            Vector3 fromRotation = transform.forward;
 
-        var angleToTarget = Vector3.Angle(fromRotation, toRotation);
+            var angleToTarget = Vector3.Angle(fromRotation, toRotation);
 
-        if (angleToTarget <= ROTATION_COMPLETE_THRESHOLD)
-            return true;
+            if (angleToTarget <= ROTATION_COMPLETE_THRESHOLD)
+                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.ROTATION_COMPLETE, execData.target));
+            else
+                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.ROTATION_INCOMPLETE, execData.target));
+        }
         else
-            return false;
+        {
+            // error occured - no target to rotate
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.ROTATION_COMPLETE, execData.target));
+        }
     }
 
-    private bool checkIfTargetIsReached(GameObject target)
+    private void checkIfTargetIsReached(PlayerFsmExecData execData)
     {
         const float dist_threshold = 0.5f;
 
         if (!navigator.pathPending && (navigator.remainingDistance <= dist_threshold))
         {
-            return true;
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.TARGET_REACHED, execData.target));
         }
         else
-            return false;
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.TARGET_NOT_REACHED, execData.target));
     }
 
-    private bool isUsingEnded(GameObject target)
+    private void isUsingEnded(PlayerFsmExecData execData)
     {
         //TODO: isUsingEnded: implement and remove temporary implementation!!!
 
         if (Input.GetKeyDown(KeyCode.Space))
-            return true;
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ENDED, execData.target));
         else
-            return false;
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_NOT_ENDED, execData.target));
     }
 
-    #endregion
-
-    #region player_fsm_state_actions
-
-    private void emptyAction(GameObject target)
-    {
-        // do nothing
-    }
-
-    private void setIdleAnimation(GameObject target)
+    private void setIdleAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.IDLE);
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.IDLE_ANIMATION_SET, execData.target));
     }
 
-    private void setMovingAnimation(GameObject target)
+    private void setMovingAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.WALKING);
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.WALKING_ANIMATION_SET, execData.target));
     }
 
-    private void setUsingAnimation(GameObject target)
+    private void setUsingAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.USING);
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.USING_ANIMATION_SET, execData.target));
     }
 
-    private void startMovingToTarget(GameObject target)
+    private void startMovingToTarget(PlayerFsmExecData execData)
     {
-        navigator.destination = target.transform.position;
+        navigator.destination = execData.target.transform.position;
         navigator.isStopped = false;
     }
 
-    private void rotateToTarget(GameObject target)
+    private void rotateToTarget(PlayerFsmExecData execData)
     {
         const float ROTATION_SPEED = 5.0f;
 
-        if (target != null)
+        if (execData.target != null)
         {
-            var targetRotation = Quaternion.LookRotation(target.transform.position - transform.position);
+            var targetRotation = Quaternion.LookRotation(execData.target.transform.position - transform.position);
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, ROTATION_SPEED * Time.fixedDeltaTime);
         }
     }
 
-    private void startInteractiveSearch(GameObject target)
+    private void startUsingTarget(PlayerFsmExecData execData)
     {
         // TODO: startUsingTarget: implement
-    }
-
-    private void setStateIdle(GameObject target)
-    {
-        state = State.IDLE;
     }
 
     #endregion
 
     private void fillStateMachinesTransitions()
     {
-        // player turning state machine transitions table section
-        playerTurningFSM.addTransition(PlayerStateMachine.State.IDLE,                emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
-        playerTurningFSM.addTransition(PlayerStateMachine.State.TURNING,             checkRotation,          PlayerStateMachine.State.END_TURNING,          rotateToTarget);
-        playerTurningFSM.addTransition(PlayerStateMachine.State.END_TURNING,         emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
+        // TODO: complete!!!
 
-        // player moving state machine transitions table section
-        playerMovingFSM.addTransition(PlayerStateMachine.State.IDLE,                 emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.TURNING,              checkRotation,          PlayerStateMachine.State.SET_MOVING_ANIMATION, rotateToTarget);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.SET_MOVING_ANIMATION, emptyTransitionRule,    PlayerStateMachine.State.START_MOVING,         setMovingAnimation);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.START_MOVING,         emptyTransitionRule,    PlayerStateMachine.State.MOVING,               startMovingToTarget);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.MOVING,               checkIfTargetIsReached, PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyAction);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_MOVING,           setIdleAnimation);
-        playerMovingFSM.addTransition(PlayerStateMachine.State.END_MOVING,           emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
+        /*                              current state                                      event                                           next state                  action */
 
-        // player interactive search state machine transitions table section
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.IDLE,                 emptyTransitionRule,    PlayerStateMachine.State.TURNING,              emptyAction);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.TURNING,              checkRotation,          PlayerStateMachine.State.SET_MOVING_ANIMATION, rotateToTarget);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_MOVING_ANIMATION, emptyTransitionRule,    PlayerStateMachine.State.START_MOVING,         setMovingAnimation);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.START_MOVING,         emptyTransitionRule,    PlayerStateMachine.State.MOVING,               startMovingToTarget);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.MOVING,               checkIfTargetIsReached, PlayerStateMachine.State.SET_USING_ANIMATION,  emptyAction);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_USING_ANIMATION,  emptyTransitionRule,    PlayerStateMachine.State.START_USING,          setUsingAnimation);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.START_USING,          emptyTransitionRule,    PlayerStateMachine.State.USING,                startInteractiveSearch);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.USING,                isUsingEnded,           PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyAction);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.SET_IDLE_ANIMATION,   emptyTransitionRule,    PlayerStateMachine.State.END_USING,            setIdleAnimation);
-        playerInteractiveSearchFSM.addTransition(PlayerStateMachine.State.END_USING,            emptyTransitionRule,    PlayerStateMachine.State.IDLE,                 setStateIdle);
+        // IDLE transitions set
+        playerFSM.addTransition(PlayerStateMachine.State.IDLE,         PlayerStateMachine.Event.PLAYER_STARTED_TURNING,    PlayerStateMachine.State.TURNING,       checkRotation);
+
+        // TURNING transitions set
+        playerFSM.addTransition(PlayerStateMachine.State.TURNING,      PlayerStateMachine.Event.ROTATION_COMPLETE,         PlayerStateMachine.State.IDLE,          setPlayerIdle);
+        playerFSM.addTransition(PlayerStateMachine.State.TURNING,      PlayerStateMachine.Event.ROTATION_INCOMPLETE,       PlayerStateMachine.State.TURNING,       rotateToTarget);
+        playerFSM.addTransition(PlayerStateMachine.State.TURNING,      PlayerStateMachine.Event.ROTATION_PROCEEDED,        PlayerStateMachine.State.TURNING,       checkRotation);
+
+        // WALKING transitions set
+
+        // INTERACTIVE_SEARCH transitions set
+
+        // ANY_STATE transitions set
+        playerFSM.addTransition(PlayerStateMachine.State.ANY_STATE,    PlayerStateMachine.Event.PLAYER_STARTED_IDLING,      PlayerStateMachine.State.IDLE,         emptyAction);
     }
 
     #endregion

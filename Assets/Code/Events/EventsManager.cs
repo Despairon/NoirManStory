@@ -128,6 +128,7 @@ public class EventsManager
         var eventProcessor = new GameObject("eventProcessor");
         eventProcessor.AddComponent<EventProcessor>();
         eventProcessor.GetComponent<EventProcessor>().StartCoroutine(eventProcessorTask());
+        // TODO: fix infinite loop stuck
     }
 
     public void sendEventToObject(string objectName, EventID eventID, EventData eventData)

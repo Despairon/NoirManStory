@@ -51,8 +51,7 @@ public class MainCamera : MonoBehaviour
                     player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
             }
 
-            if (player.state != Player.State.IDLE)
-                followPlayer();
+            followPlayer();
         }
 	}
 

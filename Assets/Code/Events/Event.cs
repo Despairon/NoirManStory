@@ -11,7 +11,7 @@ public enum EventID
 
 public abstract class EventData
 {
-    EventData() { }
+    public EventData() { }
 }
 
 public class Event

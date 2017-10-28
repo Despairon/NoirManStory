@@ -7,7 +7,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
 {
     #region private_members   
 
-    private State                      _state;
     private bool                       doubleClicked;
     private GameObject                 clickVolumeObjPrev;
     private GameObject                 clickVolumeObjNext;
@@ -18,28 +17,22 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
     private void initializeValues()
     {
-        state                      = State.IDLE;
+        doubleClicked         = false;
 
-        doubleClicked              = false;
+        clickVolumeObjPrev    = clickVolumeObjNext = null;
 
-        clickVolumeObjPrev         = clickVolumeObjNext = null;
+        interactionsManager   = new PlayerInteractionsManager(this);
 
-        interactionsManager        = new PlayerInteractionsManager(this);
+        navigator             = GetComponent<NavMeshAgent>();
 
-        navigator                  = GetComponent<NavMeshAgent>();
+        targetObject          = null;
 
-        targetObject               = null;
+        animator              = GetComponent<Animator>();
 
-        animator                   = GetComponent<Animator>();
+        playerFSM             = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
 
-        playerTurningFSM           = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-        playerMovingFSM            = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-        playerInteractiveSearchFSM = new PlayerStateMachine(PlayerStateMachine.State.IDLE);
-
-        stateMachineMap            = new Dictionary<State, PlayerStateMachine>();
-
-        currentAnimation           = PlayerAnimation.NONE;
-        playerAnimationMap         = new Dictionary<PlayerAnimation, string>();
+        currentAnimation      = PlayerAnimation.NONE;
+        playerAnimationMap    = new Dictionary<PlayerAnimation, string>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -90,34 +83,19 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
     #region public members
 
-    public enum State
-    {
-        IDLE,
-        TURNING,
-        MOVING,
-        INTERACTIVE_SEARCHING
-    }
-
-    public State state
-    {
-        get         {  return _state;  }
-        private set { _state = value;  }
-    }
-
     public void lookAt(PlayerInteractionParams interactionParams)
     {
         targetObject = new GameObject("playerRotationTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
 
-        state = State.TURNING;
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_TURNING, targetObject));
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
         targetObject = new GameObject("playerMovementTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
-
-        state = State.MOVING;
+        // TODO: call event
     }
 
     public void interactiveSearch(PlayerInteractionParams interactionParams)
@@ -128,14 +106,25 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
         targetObject.GetComponent<Renderer>().enabled = true;
 
-        state = State.INTERACTIVE_SEARCHING;
+        // TODO: call event
+    }
+
+    private void resetTarget()
+    {
+        Destroy(targetObject);
+        targetObject = null;
+    }
+
+    private void sendEventToSelf(EventData eventData)
+    {
+        EventsManager.instance.sendEventToObject(name, EventID.PLAYER_INTERNAL_EVENT, eventData);
     }
 
     public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
     {
         doubleClicked = checkForDoubleClick(interactionPoint);
 
-        resetStateMachines();
+        resetTarget();
 
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
@@ -147,14 +136,14 @@ public partial class Player : MonoBehaviour, IEventReceiver
         switch (evt.eventID)
         {
             case EventID.PLAYER_INTERNAL_EVENT:
-                Debug.Log("player internal event received: ");
+                if (evt.eventData != null)
+                    playerFSM.execute(evt.eventData as PlayerFsmExecData);
                 break;
 
             default:
-                Debug.Log("unhandled event received: " + evt.eventID.ToString());
+                Debug.Log("unhandled event received: " + evt.eventID.ToString()); // TODO: remove debug
                 break;
         }
-        //TODO: receiveEvent: implement
     }
 
     #endregion
@@ -166,19 +155,10 @@ public partial class Player : MonoBehaviour, IEventReceiver
         initializeValues();
         attachInteractions();
         fillAnimationMap();
-        fillStateMachineMap();
         fillStateMachinesTransitions();
-    }
 
-    private void FixedUpdate()
-    {
-        if ( (state != State.IDLE) && (targetObject != null) )
-            executeFsmForState(state);
-        else
-            resetStateMachines();
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_IDLING, targetObject));
     }
-
-    private float deltaTime = 0.0f;
 
     #endregion
 }
