@@ -95,7 +95,8 @@ public partial class Player : MonoBehaviour, IEventReceiver
     {
         targetObject = new GameObject("playerMovementTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
-        // TODO: call event
+
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_MOVING, targetObject));
     }
 
     public void interactiveSearch(PlayerInteractionParams interactionParams)
@@ -106,7 +107,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
         targetObject.GetComponent<Renderer>().enabled = true;
 
-        // TODO: call event
+        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject));
     }
 
     private void resetTarget()
@@ -141,7 +142,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
                 break;
 
             default:
-                Debug.Log("unhandled event received: " + evt.eventID.ToString()); // TODO: remove debug
                 break;
         }
     }

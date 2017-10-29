@@ -99,7 +99,8 @@ public class EventsManager
                             break;
                     }
             }
-            yield return null;
+            yield return new WaitForFixedUpdate();
+            // TODO: fix for this frame events and previous frame events needed
         }
     }
 
@@ -128,7 +129,6 @@ public class EventsManager
         var eventProcessor = new GameObject("eventProcessor");
         eventProcessor.AddComponent<EventProcessor>();
         eventProcessor.GetComponent<EventProcessor>().StartCoroutine(eventProcessorTask());
-        // TODO: fix infinite loop stuck
     }
 
     public void sendEventToObject(string objectName, EventID eventID, EventData eventData)

@@ -104,6 +104,12 @@ public partial class Player : MonoBehaviour
             var targetRotation = Quaternion.LookRotation(execData.target.transform.position - transform.position);
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, ROTATION_SPEED * Time.fixedDeltaTime);
+
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.ROTATION_PROCEEDED, execData.target));
+        }
+        else
+        {
+            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.ROTATION_COMPLETE, execData.target));
         }
     }
 

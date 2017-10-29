@@ -52,24 +52,20 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
 
     public override void execute(PlayerFsmExecData execData)
     {
-        Debug.Log("execution for event " + execData.evt);
-
-        var transition = transitionsTable.Find(tr => ((tr.currentState.Equals(currentState)) || (tr.currentState.Equals(State.ANY_STATE as Enum))
+        var transition = transitionsTable.Find(tr => ( ((tr.currentState.Equals(currentState)) || (tr.currentState.Equals(State.ANY_STATE as Enum)))
                                                   &&  (tr.transitionRule == execData.evt)));
 
         if (transition != null)
         {
-            // TODO: delete debug log
-            Debug.Log("transition from " + currentState.ToString() + " to " + transition.nextState.ToString() + " by event: " + transition.transitionRule.ToString());
-
+            //TODO: delete debug log
+            Debug.Log("Transition from " + currentState.ToString() + " to " + transition.nextState.ToString() + " by event " + transition.transitionRule.ToString());
+            
             // perform exit action
             if (transition.stateAction != null)
                 transition.stateAction(execData);
 
             currentState = transition.nextState;
         }
-        else
-            Debug.Log("no such transition");
     }
 
     #endregion
