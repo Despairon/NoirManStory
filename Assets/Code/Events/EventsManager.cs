@@ -41,9 +41,15 @@ public class EventsManager
     {
         while (true)
         {
+            var currFrameEventQueue = new Queue<EventQueueElement>();
+
+            // copy queue from the previous frame
             while (_eventQueue.Count > 0)
+                currFrameEventQueue.Enqueue(_eventQueue.Dequeue());
+
+            while (currFrameEventQueue.Count > 0)
             {
-                var queueElement = _eventQueue.Dequeue();
+                var queueElement = currFrameEventQueue.Dequeue();
 
                 if ( (queueElement != null) && (queueElement.evt.eventID != EventID.NONE) )
                     switch (queueElement.broadcastType)
@@ -99,8 +105,7 @@ public class EventsManager
                             break;
                     }
             }
-            yield return new WaitForFixedUpdate();
-            // TODO: fix for this frame events and previous frame events needed
+            yield return new WaitForEndOfFrame();
         }
     }
 

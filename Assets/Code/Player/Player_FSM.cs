@@ -27,7 +27,7 @@ public partial class Player : MonoBehaviour
 
     private void checkRotation(PlayerFsmExecData execData)
     {
-        const float ROTATION_COMPLETE_THRESHOLD = 5; // angles
+        const float ROTATION_COMPLETE_THRESHOLD = 5.0f; // angles
 
         if (execData.target != null)
         {
