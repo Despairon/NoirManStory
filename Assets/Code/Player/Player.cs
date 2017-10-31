@@ -110,12 +110,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
         sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject));
     }
 
-    private void resetTarget()
-    {
-        Destroy(targetObject);
-        targetObject = null;
-    }
-
     private void sendEventToSelf(EventData eventData)
     {
         EventsManager.instance.sendEventToObject(name, EventID.PLAYER_INTERNAL_EVENT, eventData);
@@ -125,7 +119,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
     {
         doubleClicked = checkForDoubleClick(interactionPoint);
 
-        resetTarget();
+        setPlayerIdle(new PlayerFsmExecData(0,null));
 
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
@@ -156,8 +150,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
         attachInteractions();
         fillAnimationMap();
         fillStateMachinesTransitions();
-
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_IDLING, targetObject));
     }
 
     #endregion

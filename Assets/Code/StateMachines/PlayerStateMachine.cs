@@ -26,24 +26,24 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
 
         IDLE,
         TURNING,
-        WALKING,
+        MOVING,
         INTERACTIVE_SEARCH
     }
 
     public enum Event
     {
-        PLAYER_STARTED_IDLING,
         PLAYER_STARTED_TURNING,
         PLAYER_STARTED_MOVING,
         PLAYER_STARTED_INTERACTIVE_SEARCH,
-        ROTATION_COMPLETE,
-        ROTATION_INCOMPLETE,
-        ROTATION_PROCEEDED,
-        TARGET_REACHED,
-        TARGET_NOT_REACHED,
-        IDLE_ANIMATION_SET,
-        WALKING_ANIMATION_SET,
-        USING_ANIMATION_SET,
+        PLAYER_COMPLETED_ROTATING,
+        PLAYER_ROTATION_INCOMPLETE,
+        PLAYER_ROTATION_PROCEEDED,
+        PLAYER_DESTINATION_SET,
+        PLAYER_NOT_REACHED_TARGET,
+        PLAYER_REACHED_TARGET,
+        PLAYER_IDLE_ANIMATION_SET,
+        PLAYER_WALKING_ANIMATION_SET,
+        PLAYER_USING_ANIMATION_SET,
         PLAYER_USING_ENDED,
         PLAYER_USING_NOT_ENDED
     }
@@ -56,12 +56,16 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
                                                   &&    (tr.transitionRule == execData.evt)));
 
         if (transition != null)
-        {            
+        {
             // perform exit action
             if (transition.stateAction != null)
                 transition.stateAction(execData);
 
-            currentState = transition.nextState;
+            if (!currentState.Equals(transition.nextState))
+            {
+                Debug.Log("transition from " + currentState.ToString() + " to " + transition.nextState.ToString() + " by event: " + transition.transitionRule.ToString());
+                currentState = transition.nextState;
+            }
         }
     }
 
