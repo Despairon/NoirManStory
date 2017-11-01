@@ -41,6 +41,7 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
         PLAYER_DESTINATION_SET,
         PLAYER_NOT_REACHED_TARGET,
         PLAYER_REACHED_TARGET,
+        PLAYER_INTERACTIVE_DIALOG_OPENED,
         PLAYER_IDLE_ANIMATION_SET,
         PLAYER_WALKING_ANIMATION_SET,
         PLAYER_USING_ANIMATION_SET,
@@ -63,6 +64,7 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
 
             if (!currentState.Equals(transition.nextState))
             {
+                //TODO: remove log when not needed anymore
                 Debug.Log("transition from " + currentState.ToString() + " to " + transition.nextState.ToString() + " by event: " + transition.transitionRule.ToString());
                 currentState = transition.nextState;
             }

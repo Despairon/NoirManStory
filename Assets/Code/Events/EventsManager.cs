@@ -41,11 +41,9 @@ public class EventsManager
     {
         while (true)
         {
-            var currFrameEventQueue = new Queue<EventQueueElement>();
-
             // copy queue from the previous frame
-            while (_eventQueue.Count > 0)
-                currFrameEventQueue.Enqueue(_eventQueue.Dequeue());
+            var currFrameEventQueue = new Queue<EventQueueElement>(_eventQueue);
+            _eventQueue.Clear();
 
             while (currFrameEventQueue.Count > 0)
             {
