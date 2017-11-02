@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class PlayerFsmExecData : EventData
+public sealed class PlayerFsmExecData : EventData
 {
     public PlayerFsmExecData(PlayerStateMachine.Event evt, GameObject target) : base()
     {

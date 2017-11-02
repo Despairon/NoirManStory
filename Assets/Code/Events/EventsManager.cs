@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+public delegate void EventHandler(Event evt);
+
 public class EventsManager
 {
     #region private_members

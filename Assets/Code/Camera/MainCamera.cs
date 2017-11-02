@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class MainCamera : MonoBehaviour
+public partial class MainCamera : MonoBehaviour, IEventReceiver
 {
-
     #region private_members
 
     private Player  player;
@@ -48,7 +45,10 @@ public class MainCamera : MonoBehaviour
                 var ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out hit, float.PositiveInfinity, LayerMask.GetMask("InteractableObject")))
-                    player.onInteractableObjectClick(hit.collider.gameObject, hit.point);             
+                {
+                    var evtData = new InteractableObjectClickData(hit.collider.gameObject, hit.point);
+                    EventsManager.instance.sendEventToObject(player.name, EventID.INTERACTABLE_OBJECT_CLICKED, evtData);
+                }             
             }
 
             followPlayer();

@@ -6,7 +6,8 @@ using System.Text;
 public enum EventID
 {
     NONE,
-    PLAYER_INTERNAL_EVENT
+    PLAYER_INTERNAL_EVENT,
+    INTERACTABLE_OBJECT_CLICKED
 };
 
 public abstract class EventData

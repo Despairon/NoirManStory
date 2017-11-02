@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
+﻿using UnityEngine;
 
-public partial class Player : MonoBehaviour
+public partial class Player
 {
     #region private_members
 

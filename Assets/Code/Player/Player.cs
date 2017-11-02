@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -33,6 +32,8 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
         currentAnimation      = PlayerAnimation.NONE;
         playerAnimationMap    = new Dictionary<PlayerAnimation, string>();
+
+        eventHandlersMap      = new Dictionary<EventID, EventHandler>();
     }
 
     private bool checkForDoubleClick(Vector3 point)
@@ -60,11 +61,11 @@ public partial class Player : MonoBehaviour, IEventReceiver
     private GameObject createClickVolumeAt(Vector3 point)
     {
         var clickVolumeObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        clickVolumeObj.transform.position = point;
+        clickVolumeObj.transform.position   = point;
         clickVolumeObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        clickVolumeObj.GetComponent<BoxCollider>().center = Vector3.zero;
+        clickVolumeObj.GetComponent<BoxCollider>().center    = Vector3.zero;
         clickVolumeObj.GetComponent<BoxCollider>().isTrigger = true;
-        clickVolumeObj.GetComponent<Renderer>().enabled = false; // change to 'true' for debug cubes to begin being visible
+        clickVolumeObj.GetComponent<Renderer>().enabled      = false; // change to 'true' for debug cubes to begin being visible
 
         return clickVolumeObj;
     }
@@ -103,41 +104,11 @@ public partial class Player : MonoBehaviour, IEventReceiver
     {
         targetObject = Instantiate(interactionParams.obj);
 
-        targetObject.transform.position = interactionParams.interactionPoint; // TODO: REMOVE HACK! need to use original object position, but its all zeros now!
+        targetObject.transform.position = interactionParams.interactionPoint; // TODO: Need to use original object position, but its all zeros now!
 
         targetObject.GetComponent<Renderer>().enabled = true;
 
         sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject));
-    }
-
-    private void sendEventToSelf(EventData eventData)
-    {
-        EventsManager.instance.sendEventToObject(name, EventID.PLAYER_INTERNAL_EVENT, eventData);
-    }
-
-    public void onInteractableObjectClick(GameObject obj, Vector3 interactionPoint)
-    {
-        doubleClicked = checkForDoubleClick(interactionPoint);
-
-        setPlayerIdle(new PlayerFsmExecData(0,null));
-
-        interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
-
-        doubleClicked = false;
-    }
-
-    public void receiveEvent(Event evt)
-    {
-        switch (evt.eventID)
-        {
-            case EventID.PLAYER_INTERNAL_EVENT:
-                if (evt.eventData != null)
-                    playerFSM.execute(evt.eventData as PlayerFsmExecData);
-                break;
-
-            default:
-                break;
-        }
     }
 
     #endregion
@@ -150,6 +121,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
         attachInteractions();
         fillAnimationMap();
         fillStateMachinesTransitions();
+        fillEventHandlersMap();
     }
 
     #endregion
