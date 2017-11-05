@@ -7,7 +7,7 @@ public enum EventID
 {
     NONE,
     PLAYER_INTERNAL_EVENT,
-    INTERACTABLE_OBJECT_CLICKED
+    INTERACTABLE_OBJECT_CLICKED,
 };
 
 public abstract class EventData

@@ -74,9 +74,9 @@ public partial class Player : MonoBehaviour, IEventReceiver
     {
         interactionsManager.addInteraction(InteractableObjectType.WALL,                    lookAt,            InputAction.SINGLE_TAP);
 		interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   lookAt,            InputAction.SINGLE_TAP);
-        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  lookAt,            InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  interactiveSearch, InputAction.SINGLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  moveTo,            InputAction.DOUBLE_TAP);
         interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   moveTo,            InputAction.DOUBLE_TAP);
-		interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  interactiveSearch, InputAction.DOUBLE_TAP);
         // add interactions here...
     }
 
@@ -106,7 +106,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
         targetObject.transform.position = interactionParams.interactionPoint; // TODO: Need to use original object position, but its all zeros now!
 
-        targetObject.GetComponent<Renderer>().enabled = true;
+        targetObject.GetComponent<Renderer>().enabled = false;
 
         sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject));
     }

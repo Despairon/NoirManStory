@@ -20,7 +20,6 @@ public partial class MainCamera
 
     void IEventReceiver.receiveEvent(Event evt)
     {
-        Debug.Log("camera received event! " + evt.eventID.ToString());
         // TODO: ...
     }
 }

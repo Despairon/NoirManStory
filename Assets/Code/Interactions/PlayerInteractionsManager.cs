@@ -69,13 +69,13 @@ public class PlayerInteractionsManager
         {
             var interactionType = InteractableObjectsManager.getInteractionType(interactionParams.obj);
 
-            var interactionTableItems = playerInteractionTable.FindAll(interaction => (interaction.interactionType == interactionType)
-                                                                                   && ((interaction.inputAction    == inputAction)
-                                                                                   || (interaction.inputAction     == InputAction.NONE)));
+            var interaction = playerInteractionTable.Find(_interaction =>  (_interaction.interactionType == interactionType)
+                                                                       && ((_interaction.inputAction     == inputAction)
+                                                                       ||  (_interaction.inputAction     == InputAction.NONE)));
 
-            foreach (var interactionTableItem in interactionTableItems)
-                if (interactionTableItem.interact != null)
-                    interactionTableItem.interact(interactionParams);
+            if (interaction != null)
+                if (interaction.interact != null)
+                    interaction.interact(interactionParams);
         }
     }
      
