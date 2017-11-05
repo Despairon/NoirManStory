@@ -39,14 +39,14 @@ public partial class Player
             var angleToTarget = Vector3.Angle(fromRotation, toRotation);
 
             if (angleToTarget <= ROTATION_COMPLETE_THRESHOLD)
-                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target, execData.originalObject));
             else
-                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_ROTATION_INCOMPLETE, execData.target));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_ROTATION_INCOMPLETE, execData.target, execData.originalObject));
         }
         else
         {
             // error occured - no target to rotate
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target, execData.originalObject));
         }
     }
 
@@ -57,14 +57,14 @@ public partial class Player
         if (execData.target != null)
         {
             if (!navigator.pathPending && (navigator.remainingDistance <= dist_threshold))
-                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target, execData.originalObject));
             else
-                sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_NOT_REACHED_TARGET, execData.target));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_NOT_REACHED_TARGET, execData.target, execData.originalObject));
         }
         else
         {
             // error occured - no target to reach
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target, execData.originalObject));
         }
     }
 
@@ -73,27 +73,27 @@ public partial class Player
         //TODO: isUsingEnded: implement and remove temporary implementation!!!
 
         if (Input.GetKey(KeyCode.Space))
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ENDED, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ENDED, execData.target, execData.originalObject));
         else
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_NOT_ENDED, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_NOT_ENDED, execData.target, execData.originalObject));
     }
 
     private void setIdleAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.IDLE);
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_IDLE_ANIMATION_SET, execData.target));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_IDLE_ANIMATION_SET, execData.target, execData.originalObject));
     }
 
     private void setMovingAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.WALKING);
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_WALKING_ANIMATION_SET, execData.target));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_WALKING_ANIMATION_SET, execData.target, execData.originalObject));
     }
 
     private void setUsingAnimation(PlayerFsmExecData execData)
     {
         playAnim(PlayerAnimation.USING);
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ANIMATION_SET, execData.target));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ANIMATION_SET, execData.target, execData.originalObject));
     }
 
     private void rotateToTarget(PlayerFsmExecData execData)
@@ -106,11 +106,11 @@ public partial class Player
 
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, ROTATION_SPEED * Time.fixedDeltaTime);
 
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_ROTATION_PROCEEDED, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_ROTATION_PROCEEDED, execData.target, execData.originalObject));
         }
         else
         {
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING, execData.target, execData.originalObject));
         }
     }
 
@@ -121,27 +121,25 @@ public partial class Player
             navigator.destination = execData.target.transform.position;
             navigator.isStopped = false;
 
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_DESTINATION_SET, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_DESTINATION_SET, execData.target, execData.originalObject));
         }
         else
         {
             // error occured - no target to reach
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_REACHED_TARGET, execData.target, execData.originalObject));
         }
     }
 
     private void checkIfInterObjIsInRange(PlayerFsmExecData execData)
     {
-        if (execData.target != null)
+		if ((execData.target != null) && (execData.originalObject != null))
         {
-            //EventsManager.instance.sendEventToObject(execData.target.name, EventID.PLAYER_INTER_OBJ_COLLISION_REQUEST, null);
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_IN_RANGE, execData.target));
-            //sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, execData.target));
+			EventsManager.instance.sendEventToObject(execData.originalObject.name, EventID.PLAYER_TO_INTER_OBJ_IS_PLAYER_IN_RANGE, null);
         }
         else
         {
             // error occured - no target to use
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, execData.target, execData.originalObject));
         }
     }
 
@@ -150,12 +148,12 @@ public partial class Player
         if (execData.target != null)
         {
             // TODO: startInteractiveSearch: do stuff
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTERACTIVE_DIALOG_OPENED, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTERACTIVE_DIALOG_OPENED, execData.target, execData.originalObject));
         }
         else
         {
             // error occured - nothing to use
-            sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ENDED, execData.target));
+			sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_USING_ENDED, execData.target, execData.originalObject));
         }
     }
 

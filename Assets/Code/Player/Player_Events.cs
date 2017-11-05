@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public partial class Player
 {
@@ -6,8 +7,10 @@ public partial class Player
 
     private void fillEventHandlersMap()
     {
-        eventHandlersMap.Add(EventID.PLAYER_INTERNAL_EVENT,       handleInternalEvents);
-        eventHandlersMap.Add(EventID.INTERACTABLE_OBJECT_CLICKED, handleInteractableObjectClick);
+        eventHandlersMap.Add(EventID.PLAYER_INTERNAL_EVENT,            handleInternalEvents);
+        eventHandlersMap.Add(EventID.INTERACTABLE_OBJECT_CLICKED,      handleInteractableObjectClick);
+		eventHandlersMap.Add(EventID.INTER_OBJ_TO_PLAYER_IN_RANGE,     handlePlayerInRangeRequest);
+		eventHandlersMap.Add(EventID.INTER_OBJ_TO_PLAYER_OUT_OF_RANGE, handlePlayerInRangeRequest);
         
         // add event handling mappings here...
     }
@@ -43,7 +46,7 @@ public partial class Player
             playerFSM.execute(evt.eventData as PlayerFsmExecData);
     }
 
-    public void handleInteractableObjectClick(Event evt)
+    private void handleInteractableObjectClick(Event evt)
     {
         var clickData        = (evt.eventData as MainCamera.InteractableObjectClickData);
         var obj              = clickData.obj;
@@ -51,12 +54,28 @@ public partial class Player
 
         doubleClicked = checkForDoubleClick(interactionPoint);
 
-        setPlayerIdle(new PlayerFsmExecData(0, null));
+        setPlayerIdle(new PlayerFsmExecData(0, null, null));
 
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
         doubleClicked = false;
     }
+
+	private void handlePlayerInRangeRequest(Event evt)
+	{
+		switch (evt.eventID) 
+		{
+			case EventID.INTER_OBJ_TO_PLAYER_IN_RANGE:
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_IN_RANGE, targetObject, targetObject));
+		    	break;
+			case EventID.INTER_OBJ_TO_PLAYER_OUT_OF_RANGE:
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, targetObject, targetObject));
+		   	 	break;
+
+			default:
+				break;
+		}
+	}
 
     #endregion
 }

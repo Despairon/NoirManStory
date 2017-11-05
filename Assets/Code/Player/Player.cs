@@ -89,7 +89,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
         targetObject = new GameObject("playerRotationTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
 
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_TURNING, targetObject));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_TURNING, targetObject, targetObject));
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
@@ -97,7 +97,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
         targetObject = new GameObject("playerMovementTarget");
         targetObject.transform.position = interactionParams.interactionPoint;
 
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_MOVING, targetObject));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_MOVING, targetObject, targetObject));
     }
 
     public void interactiveSearch(PlayerInteractionParams interactionParams)
@@ -108,7 +108,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
         targetObject.GetComponent<Renderer>().enabled = false;
 
-        sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject, interactionParams.obj));
     }
 
     #endregion

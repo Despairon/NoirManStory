@@ -6,14 +6,16 @@ using UnityEngine;
 
 public sealed class PlayerFsmExecData : EventData
 {
-    public PlayerFsmExecData(PlayerStateMachine.Event evt, GameObject target) : base()
+	public PlayerFsmExecData(PlayerStateMachine.Event evt, GameObject target, GameObject originalObject) : base()
     {
-        this.evt    = evt;
-        this.target = target;
+        this.evt            = evt;
+        this.target         = target;
+		this.originalObject = originalObject;
     }
 
     public readonly PlayerStateMachine.Event evt;
     public readonly GameObject               target;
+	public readonly GameObject               originalObject;
 }
 
 public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerFsmExecData>

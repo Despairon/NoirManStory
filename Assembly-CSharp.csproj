@@ -52,10 +52,17 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Code\Camera\MainCamera.cs" />
+     <Compile Include="Assets\Code\Camera\MainCamera_Events.cs" />
+     <Compile Include="Assets\Code\Events\Event.cs" />
+     <Compile Include="Assets\Code\Events\EventsManager.cs" />
+     <Compile Include="Assets\Code\Events\IEventReceiver.cs" />
      <Compile Include="Assets\Code\Interactions\InteractableObjectsManager.cs" />
      <Compile Include="Assets\Code\Interactions\PlayerInteractionsManager.cs" />
+     <Compile Include="Assets\Code\InteractiveObject\InteractiveObject.cs" />
+     <Compile Include="Assets\Code\InteractiveObject\InteractiveObject_Events.cs" />
      <Compile Include="Assets\Code\Player\Player.cs" />
      <Compile Include="Assets\Code\Player\Player_Animation.cs" />
+     <Compile Include="Assets\Code\Player\Player_Events.cs" />
      <Compile Include="Assets\Code\Player\Player_FSM.cs" />
      <Compile Include="Assets\Code\StateMachines\PlayerStateMachine.cs" />
      <Compile Include="Assets\Code\StateMachines\StateMachine.cs" />
