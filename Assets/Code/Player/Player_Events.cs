@@ -54,7 +54,7 @@ public partial class Player
 
         doubleClicked = checkForDoubleClick(interactionPoint);
 
-        setPlayerIdle(new PlayerFsmExecData(0, null, null));
+        setPlayerIdle(new PlayerFsmExecData(0, null));
 
         interactionsManager.interactWith(new PlayerInteractionParams(obj, interactionPoint), doubleClicked ? InputAction.DOUBLE_TAP : InputAction.SINGLE_TAP);
 
@@ -66,10 +66,10 @@ public partial class Player
 		switch (evt.eventID) 
 		{
 			case EventID.INTER_OBJ_TO_PLAYER_IN_RANGE:
-				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_IN_RANGE, targetObject, targetObject));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_IN_RANGE, (evt.eventData as PlayerFsmExecData).interactionParams));
 		    	break;
 			case EventID.INTER_OBJ_TO_PLAYER_OUT_OF_RANGE:
-				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, targetObject, targetObject));
+				sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE, (evt.eventData as PlayerFsmExecData).interactionParams));
 		   	 	break;
 
 			default:

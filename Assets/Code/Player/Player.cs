@@ -12,7 +12,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
     private PlayerInteractionsManager  interactionsManager;
     private NavMeshAgent               navigator;
     private Animator                   animator;
-    private GameObject                 targetObject;
 
     private void initializeValues()
     {
@@ -23,8 +22,6 @@ public partial class Player : MonoBehaviour, IEventReceiver
         interactionsManager   = new PlayerInteractionsManager(this);
 
         navigator             = GetComponent<NavMeshAgent>();
-
-        targetObject          = null;
 
         animator              = GetComponent<Animator>();
 
@@ -86,29 +83,17 @@ public partial class Player : MonoBehaviour, IEventReceiver
 
     public void lookAt(PlayerInteractionParams interactionParams)
     {
-        targetObject = new GameObject("playerRotationTarget");
-        targetObject.transform.position = interactionParams.interactionPoint;
-
-		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_TURNING, targetObject, targetObject));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_TURNING, interactionParams));
     }
 
     public void moveTo(PlayerInteractionParams interactionParams)
     {
-        targetObject = new GameObject("playerMovementTarget");
-        targetObject.transform.position = interactionParams.interactionPoint;
-
-		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_MOVING, targetObject, targetObject));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_MOVING, interactionParams));
     }
 
     public void interactiveSearch(PlayerInteractionParams interactionParams)
     {
-        targetObject = Instantiate(interactionParams.obj);
-
-        targetObject.transform.position = interactionParams.interactionPoint; // TODO: Need to use original object position, but its all zeros now!
-
-        targetObject.GetComponent<Renderer>().enabled = false;
-
-		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, targetObject, interactionParams.obj));
+		sendEventToSelf(new PlayerFsmExecData(PlayerStateMachine.Event.PLAYER_STARTED_INTERACTIVE_SEARCH, interactionParams));
     }
 
     #endregion

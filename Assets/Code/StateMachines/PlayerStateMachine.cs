@@ -6,16 +6,14 @@ using UnityEngine;
 
 public sealed class PlayerFsmExecData : EventData
 {
-	public PlayerFsmExecData(PlayerStateMachine.Event evt, GameObject target, GameObject originalObject) : base()
+	public PlayerFsmExecData(PlayerStateMachine.Event evt, PlayerInteractionParams interactionParams) : base()
     {
-        this.evt            = evt;
-        this.target         = target;
-		this.originalObject = originalObject;
+        this.evt                = evt;
+        this.interactionParams  = interactionParams;
     }
 
     public readonly PlayerStateMachine.Event evt;
-    public readonly GameObject               target;
-	public readonly GameObject               originalObject;
+    public readonly PlayerInteractionParams  interactionParams;
 }
 
 public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerFsmExecData>
@@ -67,11 +65,7 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
                 transition.stateAction(execData);
 
             if (!currentState.Equals(transition.nextState))
-            {
-                //TODO: remove log when not needed anymore
-                Debug.Log("transition from " + currentState.ToString() + " to " + transition.nextState.ToString() + " by event: " + transition.transitionRule.ToString());
                 currentState = transition.nextState;
-            }
         }
     }
 

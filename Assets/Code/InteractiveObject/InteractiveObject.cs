@@ -22,7 +22,7 @@ public partial class InteractiveObject : MonoBehaviour, IEventReceiver
 
 	public void OnTriggerEnter(Collider trigger)
 	{
-		if (trigger.CompareTag ("Player") == true) 
+		if (trigger.CompareTag("Player") == true) 
 		{
 			isPlayerInRange = true;
 		}
@@ -30,7 +30,7 @@ public partial class InteractiveObject : MonoBehaviour, IEventReceiver
 
 	public void OnTriggerExit(Collider trigger)
 	{
-		if (trigger.CompareTag ("Player") == true) 
+		if (trigger.CompareTag("Player") == true) 
 		{
 			isPlayerInRange = false;
 		}

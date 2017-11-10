@@ -10,16 +10,17 @@ public enum InputAction
     DOUBLE_TAP
 }
 
-public struct PlayerInteractionParams
+public class PlayerInteractionParams
 {
-    public readonly GameObject obj;
-    public readonly Vector3    interactionPoint;
-
     public PlayerInteractionParams(GameObject obj, Vector3 interactionPoint)
     {
         this.obj              = obj;
         this.interactionPoint = interactionPoint;
     }
+
+    public readonly GameObject obj;
+    public readonly Vector3 interactionPoint;
+
 }
 
 public class PlayerInteractionsManager
