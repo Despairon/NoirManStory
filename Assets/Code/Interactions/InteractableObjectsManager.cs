@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,9 @@ public enum InteractableObjectType
     FLOOR,
     WALL,
 	DOOR,
-    INTERACTIVE_SEARCHABLE
+    INTERACTIVE_SEARCHABLE,
+    PICK_UPABLE,
+    PERSON
     // add types here
 }
 
@@ -21,7 +24,9 @@ public static class InteractableObjectsManager
         { "Floor",                 InteractableObjectType.FLOOR                  },
         { "Wall",                  InteractableObjectType.WALL                   },
 		{ "Door",                  InteractableObjectType.DOOR                   },
-        { "InteractiveSearchable", InteractableObjectType.INTERACTIVE_SEARCHABLE }
+        { "InteractiveSearchable", InteractableObjectType.INTERACTIVE_SEARCHABLE },
+        { "PickUpable",            InteractableObjectType.PICK_UPABLE            },
+        { "Person",                InteractableObjectType.PERSON                 }
     };
 
     #endregion
@@ -34,7 +39,12 @@ public static class InteractableObjectsManager
         {
             var objType = interactableObjectsMap[obj.tag];
 
-            return objType == InteractableObjectType.INVALID ? false : true;
+            Enum.IsDefined(typeof(InteractableObjectType), objType);
+
+            if (Enum.IsDefined(typeof(InteractableObjectType), objType) && (objType != InteractableObjectType.INVALID))
+                return true;
+            else
+                return false;
         }
         catch (KeyNotFoundException)
         {

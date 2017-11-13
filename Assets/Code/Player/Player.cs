@@ -72,7 +72,7 @@ public partial class Player : MonoBehaviour, IEventReceiver
         interactionsManager.addInteraction(InteractableObjectType.WALL,                    lookAt,            InputAction.SINGLE_TAP);
 		interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   lookAt,            InputAction.SINGLE_TAP);
         interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  interactiveSearch, InputAction.SINGLE_TAP);
-        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  moveTo,            InputAction.DOUBLE_TAP);
+        interactionsManager.addInteraction(InteractableObjectType.INTERACTIVE_SEARCHABLE,  interactiveSearch, InputAction.DOUBLE_TAP);
         interactionsManager.addInteraction(InteractableObjectType.FLOOR,                   moveTo,            InputAction.DOUBLE_TAP);
         // add interactions here...
     }

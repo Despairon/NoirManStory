@@ -27,7 +27,7 @@ public class PlayerStateMachine : StateMachine<PlayerStateMachine.Event, PlayerF
         IDLE,
         TURNING,
         MOVING,
-        INTERACTIVE_SEARCH
+        INTERACTIVE_SEARCH,
     }
 
     public enum Event

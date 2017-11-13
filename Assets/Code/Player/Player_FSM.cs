@@ -11,8 +11,7 @@ public partial class Player
         if (execData != null)
         {
             if (execData.interactionParams != null)
-                if ((execData.interactionParams.interactionPoint != null)
-                &&  (execData.interactionParams.obj              != null))
+                if (execData.interactionParams.obj != null)
                     return true;
         }
 
@@ -198,7 +197,7 @@ public partial class Player
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_ROTATION_INCOMPLETE,        PlayerStateMachine.State.INTERACTIVE_SEARCH, rotateToTarget);
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_ROTATION_PROCEEDED,         PlayerStateMachine.State.INTERACTIVE_SEARCH, checkRotation);
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_COMPLETED_ROTATING,         PlayerStateMachine.State.INTERACTIVE_SEARCH, checkIfInterObjIsInRange);
-        playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE,  PlayerStateMachine.State.IDLE,               setPlayerIdle);
+        playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_INTER_OBJECT_OUT_OF_RANGE,  PlayerStateMachine.State.MOVING,             checkRotation);
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_INTER_OBJECT_IN_RANGE,      PlayerStateMachine.State.INTERACTIVE_SEARCH, setUsingAnimation);
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_USING_ANIMATION_SET,        PlayerStateMachine.State.INTERACTIVE_SEARCH, startInteractiveSearch);
         playerFSM.addTransition(PlayerStateMachine.State.INTERACTIVE_SEARCH, PlayerStateMachine.Event.PLAYER_INTERACTIVE_DIALOG_OPENED,  PlayerStateMachine.State.INTERACTIVE_SEARCH, isUsingEnded);
