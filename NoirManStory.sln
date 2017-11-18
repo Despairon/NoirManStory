@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoirManStory", "NoirManStory.csproj", "{03F7134A-F157-4EFD-C8C0-2CC5662F374A}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoirManStory", "Assembly-CSharp.csproj", "{E3530980-1062-569E-0224-BF6D66DB15B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,12 +9,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{03F7134A-F157-4EFD-C8C0-2CC5662F374A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03F7134A-F157-4EFD-C8C0-2CC5662F374A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03F7134A-F157-4EFD-C8C0-2CC5662F374A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03F7134A-F157-4EFD-C8C0-2CC5662F374A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3530980-1062-569E-0224-BF6D66DB15B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3530980-1062-569E-0224-BF6D66DB15B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3530980-1062-569E-0224-BF6D66DB15B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3530980-1062-569E-0224-BF6D66DB15B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal

@@ -170,9 +170,7 @@ public partial class Player
 
     private void fillStateMachinesTransitions()
     {
-        // TODO: complete!!!
-
-        /*                              current state                                      event                                           next state                           action */
+        /*                              current state                                      event                                           next state                                 action */
 
         // IDLE transitions set
         playerFSM.addTransition(PlayerStateMachine.State.IDLE,               PlayerStateMachine.Event.PLAYER_STARTED_TURNING,            PlayerStateMachine.State.TURNING,            checkRotation);

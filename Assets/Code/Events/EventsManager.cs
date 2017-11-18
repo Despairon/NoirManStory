@@ -105,7 +105,7 @@ public class EventsManager
                             break;
                     }
             }
-            yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
         }
     }
 
